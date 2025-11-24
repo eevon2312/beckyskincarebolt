@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,9 +9,10 @@ import {
   Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ArrowLeft, Camera, Upload, Sparkles } from 'lucide-react-native';
+import { ArrowLeft, Camera, Upload, Sparkles, CheckCircle, AlertTriangle, XCircle } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import ProductAnalysisLoader from '@/components/ProductAnalysisLoader';
+import storage from '../src/utils/storage';
 
 type ScanMode = 'single' | 'bulk';
 
@@ -21,6 +22,25 @@ export default function ScanProducts() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [skinProfile, setSkinProfile] = useState<any>(null);
+
+  useEffect(() => {
+    loadSkinProfile();
+  }, []);
+
+  const loadSkinProfile = async () => {
+    try {
+      const data = await storage.getSkinAnalysis();
+      if (data) {
+        setSkinProfile({
+          skinType: data.skinType,
+          concerns: data.concerns?.map((c: any) => c.type) || [],
+        });
+      }
+    } catch (error) {
+      console.log('No skin profile found');
+    }
+  };
 
   const pickImageFromGallery = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -126,6 +146,14 @@ export default function ScanProducts() {
             </Text>
           </View>
         </View>
+
+        {skinProfile && (
+          <View style={styles.profileBanner}>
+            <Text style={styles.bannerText}>
+              Analyzing for {skinProfile.skinType} skin with {skinProfile.concerns.join(', ')}
+            </Text>
+          </View>
+        )}
 
         <View style={styles.modeToggleContainer}>
           <TouchableOpacity
@@ -284,6 +312,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#6B7280',
     lineHeight: 20,
+  },
+  profileBanner: {
+    backgroundColor: '#EFF6FF',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    marginHorizontal: 20,
+    marginBottom: 20,
+    borderRadius: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: '#2563EB',
+  },
+  bannerText: {
+    fontSize: 14,
+    color: '#1E40AF',
+    fontWeight: '600',
   },
   modeToggleContainer: {
     flexDirection: 'row',

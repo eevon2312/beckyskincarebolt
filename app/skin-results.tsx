@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ArrowLeft, Check, AlertCircle } from 'lucide-react-native';
+import { ArrowLeft, Check, AlertCircle, AlertTriangle, Package } from 'lucide-react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -220,6 +220,75 @@ export default function SkinResults() {
         </View>
 
         <View style={styles.section}>
+          <Text style={styles.sectionTitle}>⚠️ Ingredients to Avoid</Text>
+          <View style={styles.warningCard}>
+            {results.concerns && results.concerns.some((c: any) => c.type.toLowerCase().includes('acne')) && (
+              <>
+                <View style={styles.warningItem}>
+                  <AlertTriangle color="#EF4444" size={18} strokeWidth={2} />
+                  <View style={styles.warningContent}>
+                    <Text style={styles.warningIngredient}>Heavy oils (coconut, cocoa butter)</Text>
+                    <Text style={styles.warningReason}>Can clog pores</Text>
+                  </View>
+                </View>
+                <View style={styles.warningItem}>
+                  <AlertTriangle color="#EF4444" size={18} strokeWidth={2} />
+                  <View style={styles.warningContent}>
+                    <Text style={styles.warningIngredient}>High fragrance products</Text>
+                    <Text style={styles.warningReason}>May irritate</Text>
+                  </View>
+                </View>
+              </>
+            )}
+            {results.concerns && (results.concerns.some((c: any) => c.type.toLowerCase().includes('sensitive')) || results.concerns.some((c: any) => c.type.toLowerCase().includes('redness'))) && (
+              <>
+                <View style={styles.warningItem}>
+                  <AlertTriangle color="#EF4444" size={18} strokeWidth={2} />
+                  <View style={styles.warningContent}>
+                    <Text style={styles.warningIngredient}>Fragrances & essential oils</Text>
+                    <Text style={styles.warningReason}>Common irritants</Text>
+                  </View>
+                </View>
+                <View style={styles.warningItem}>
+                  <AlertTriangle color="#EF4444" size={18} strokeWidth={2} />
+                  <View style={styles.warningContent}>
+                    <Text style={styles.warningIngredient}>Alcohol denat</Text>
+                    <Text style={styles.warningReason}>Can dry and irritate</Text>
+                  </View>
+                </View>
+              </>
+            )}
+            {results.concerns && results.concerns.some((c: any) => c.type.toLowerCase().includes('dry')) && (
+              <>
+                <View style={styles.warningItem}>
+                  <AlertTriangle color="#EF4444" size={18} strokeWidth={2} />
+                  <View style={styles.warningContent}>
+                    <Text style={styles.warningIngredient}>Harsh sulfates (SLS)</Text>
+                    <Text style={styles.warningReason}>Strips natural oils</Text>
+                  </View>
+                </View>
+                <View style={styles.warningItem}>
+                  <AlertTriangle color="#EF4444" size={18} strokeWidth={2} />
+                  <View style={styles.warningContent}>
+                    <Text style={styles.warningIngredient}>High alcohol content</Text>
+                    <Text style={styles.warningReason}>Worsens dryness</Text>
+                  </View>
+                </View>
+              </>
+            )}
+            {results.concerns && (results.concerns.some((c: any) => c.type.toLowerCase().includes('aging')) || results.concerns.some((c: any) => c.type.toLowerCase().includes('wrinkle'))) && (
+              <View style={styles.warningItem}>
+                <AlertTriangle color="#EF4444" size={18} strokeWidth={2} />
+                <View style={styles.warningContent}>
+                  <Text style={styles.warningIngredient}>Skipping SPF</Text>
+                  <Text style={styles.warningReason}>UV causes premature aging</Text>
+                </View>
+              </View>
+            )}
+          </View>
+        </View>
+
+        <View style={styles.section}>
           <Text style={styles.sectionTitle}>Ingredients That Can Help</Text>
           <View style={styles.recommendationsGrid}>
             {results.recommendations && results.recommendations.map((rec: any, index: number) => {
@@ -244,17 +313,6 @@ export default function SkinResults() {
           </View>
         </View>
 
-        {results.positives && results.positives.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>What's Working Well ✨</Text>
-            {results.positives.map((positive: string, index: number) => (
-              <View key={index} style={styles.positiveCard}>
-                <Check color="#10B981" size={20} strokeWidth={2} />
-                <Text style={styles.positiveText}>{positive}</Text>
-              </View>
-            ))}
-          </View>
-        )}
 
         {results.nextSteps && results.nextSteps.length > 0 && (
           <View style={styles.section}>
@@ -270,29 +328,39 @@ export default function SkinResults() {
           </View>
         )}
 
+        <View style={styles.transitionCard}>
+          <Package color="#2563EB" size={28} strokeWidth={2} />
+          <Text style={styles.transitionTitle}>📦 Check Your Current Products</Text>
+          <Text style={styles.transitionDescription}>
+            Scan your skincare to see if they're helping or hurting your {results.skinType} skin. I'll check for conflicts and suggest what to keep or replace.
+          </Text>
+          <TouchableOpacity
+            style={styles.transitionButton}
+            onPress={() => router.push('/scan-products')}
+          >
+            <Text style={styles.transitionButtonText}>Scan My Products</Text>
+          </TouchableOpacity>
+        </View>
+
         <View style={{ height: 240 }} />
       </ScrollView>
 
       <View style={styles.bottomActions}>
         <TouchableOpacity
           style={styles.primaryButton}
-          onPress={() => router.push('/routines')}
+          onPress={() => {
+            console.log('💾 Saving analysis...');
+            router.push('/home');
+          }}
         >
-          <Text style={styles.primaryButtonText}>View My Routine</Text>
+          <Text style={styles.primaryButtonText}>Save Analysis</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.outlineButton}
-          onPress={() => router.push('/scan-products')}
-        >
-          <Text style={styles.outlineButtonText}>Scan Products</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.textButton}
           onPress={() => router.push('/skin-check')}
         >
-          <Text style={styles.textButtonText}>Analyze Again</Text>
+          <Text style={styles.outlineButtonText}>Start Over</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -542,6 +610,69 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: '#2C2C2C',
+  },
+  warningCard: {
+    backgroundColor: '#FEF2F2',
+    borderRadius: 16,
+    padding: 20,
+    marginHorizontal: 20,
+    borderLeftWidth: 4,
+    borderLeftColor: '#EF4444',
+    gap: 16,
+  },
+  warningItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+  },
+  warningContent: {
+    flex: 1,
+  },
+  warningIngredient: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#991B1B',
+    marginBottom: 4,
+  },
+  warningReason: {
+    fontSize: 14,
+    color: '#7F1D1D',
+  },
+  transitionCard: {
+    backgroundColor: '#EFF6FF',
+    borderRadius: 24,
+    padding: 24,
+    marginHorizontal: 20,
+    marginBottom: 24,
+    alignItems: 'center',
+  },
+  transitionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1E3A8A',
+    marginTop: 12,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  transitionDescription: {
+    fontSize: 15,
+    color: '#1E40AF',
+    lineHeight: 22,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  transitionButton: {
+    width: '100%',
+    height: 56,
+    backgroundColor: '#2C2C2C',
+    borderRadius: 9999,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  transitionButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   bottomActions: {
     position: 'absolute',
