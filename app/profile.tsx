@@ -17,12 +17,14 @@ import {
   Star,
   LogOut,
   Trash2,
+  Home as HomeIcon,
 } from 'lucide-react-native';
-import BottomNav from '../src/components/BottomNav';
+import { useRouter } from 'expo-router';
 import Toast from '../src/components/Toast';
 import storage from '../src/utils/storage';
 
 export default function Profile() {
+  const router = useRouter();
   const [toast, setToast] = useState({ visible: false, message: '', type: 'success' as 'success' | 'error' | 'info' });
   const user = {
     username: 'eevontan95',
@@ -209,7 +211,20 @@ export default function Profile() {
         type={toast.type}
         onDismiss={() => setToast({ ...toast, visible: false })}
       />
-      <BottomNav activePage="profile" />
+      <View style={styles.bottomNav}>
+        <TouchableOpacity
+          style={styles.navTab}
+          onPress={() => router.push('/home')}
+        >
+          <HomeIcon color="#9CA3AF" size={24} strokeWidth={2} />
+          <Text style={styles.navLabel}>Home</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.navTab}>
+          <User color="#A8C8A5" size={24} strokeWidth={2} />
+          <Text style={[styles.navLabel, styles.navLabelActive]}>Profile</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -440,5 +455,31 @@ const styles = StyleSheet.create({
   versionText: {
     fontSize: 12,
     color: '#9CA3AF',
+  },
+  bottomNav: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 72,
+    backgroundColor: '#2C2C2C',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    paddingBottom: 8,
+  },
+  navTab: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+  },
+  navLabel: {
+    fontSize: 12,
+    color: '#9CA3AF',
+    marginTop: 4,
+  },
+  navLabelActive: {
+    color: '#A8C8A5',
   },
 });

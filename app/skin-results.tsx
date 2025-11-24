@@ -347,8 +347,18 @@ export default function SkinResults() {
       <View style={styles.bottomActions}>
         <TouchableOpacity
           style={styles.primaryButton}
-          onPress={() => {
-            console.log('💾 Analysis saved!');
+          onPress={async () => {
+            console.log('💾 Saving analysis...');
+            try {
+              const dataToSave = {
+                ...results,
+                timestamp: new Date().toISOString(),
+              };
+              await storage.saveSkinAnalysis(dataToSave);
+              console.log('✓ Analysis saved!');
+            } catch (error) {
+              console.error('Error saving analysis:', error);
+            }
             router.push('/home');
           }}
         >

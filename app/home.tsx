@@ -1,9 +1,40 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Camera, Package, Home as HomeIcon, Search, List, User } from 'lucide-react-native';
+import { Camera, Home as HomeIcon, User } from 'lucide-react-native';
+import { useState, useEffect } from 'react';
+import storage from '../src/utils/storage';
 
 export default function Home() {
   const router = useRouter();
+  const [savedAnalysis, setSavedAnalysis] = useState<any>(null);
+
+  useEffect(() => {
+    loadSavedAnalysis();
+  }, []);
+
+  const loadSavedAnalysis = async () => {
+    try {
+      const data = await storage.getSkinAnalysis();
+      if (data) {
+        setSavedAnalysis(data);
+      }
+    } catch (error) {
+      console.log('No saved analysis found');
+    }
+  };
+
+  const getTimeAgo = (timestamp: string) => {
+    if (!timestamp) return 'Never';
+    const now = new Date();
+    const then = new Date(timestamp);
+    const diffMs = now.getTime() - then.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    return `${Math.floor(diffDays / 7)} weeks ago`;
+  };
 
   return (
     <View style={styles.container}>
@@ -31,61 +62,42 @@ export default function Home() {
               <Text style={styles.cardButtonText}>Start Analysis</Text>
             </View>
           </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.featureCard, styles.routineCard]}
-            onPress={() => router.push('/scan-products')}
-            activeOpacity={0.8}
-          >
-            <Package color="#2C2C2C" size={64} strokeWidth={1.5} />
-            <Text style={styles.cardTitle}>Build My Routine</Text>
-            <Text style={styles.cardDescription}>
-              Scan your products to optimize your routine
-            </Text>
-            <View style={[styles.badge, styles.badgePeach]}>
-              <Text style={styles.badgeText}>🔬 Conflict detection</Text>
-            </View>
-            <View style={styles.cardButton}>
-              <Text style={styles.cardButtonText}>Scan Products</Text>
-            </View>
-          </TouchableOpacity>
         </View>
 
-        <View style={styles.statsBar}>
-          <View style={styles.statItem}>
-            <Text style={styles.statText}>Last check: Never</Text>
+        {savedAnalysis && (
+          <View style={styles.recentAnalysisCard}>
+            <View style={styles.recentHeader}>
+              <Text style={styles.recentTitle}>Last Analysis</Text>
+              <Text style={styles.recentTime}>{getTimeAgo(savedAnalysis.timestamp)}</Text>
+            </View>
+            <View style={styles.recentContent}>
+              <View style={styles.scoreCircle}>
+                <Text style={styles.scoreNumber}>{savedAnalysis.healthScore}</Text>
+                <Text style={styles.scoreLabel}>Skin Health</Text>
+              </View>
+              <View style={styles.recentInfo}>
+                <Text style={styles.recentSkinType}>{savedAnalysis.skinType} Skin</Text>
+                <Text style={styles.recentConcerns}>
+                  {savedAnalysis.concerns?.length || 0} concerns detected
+                </Text>
+              </View>
+            </View>
+            <TouchableOpacity
+              style={styles.viewResultsButton}
+              onPress={() => router.push('/skin-results')}
+            >
+              <Text style={styles.viewResultsText}>View Full Results →</Text>
+            </TouchableOpacity>
           </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={styles.statText}>Products: 0</Text>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={styles.statText}>Routine score: --</Text>
-          </View>
-        </View>
+        )}
+
+        <Text style={styles.comingSoonText}>Coming soon: Product scanner 📦</Text>
       </ScrollView>
 
       <View style={styles.bottomNav}>
         <TouchableOpacity style={styles.navTab}>
           <HomeIcon color="#A8C8A5" size={24} strokeWidth={2} />
           <Text style={[styles.navLabel, styles.navLabelActive]}>Home</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.navTab}
-          onPress={() => router.push('/products')}
-        >
-          <Search color="#9CA3AF" size={24} strokeWidth={2} />
-          <Text style={styles.navLabel}>Products</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.navTab}
-          onPress={() => router.push('/routines')}
-        >
-          <List color="#9CA3AF" size={24} strokeWidth={2} />
-          <Text style={styles.navLabel}>Routines</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -148,9 +160,6 @@ const styles = StyleSheet.create({
   skinCheckCard: {
     backgroundColor: '#E8F5E9',
   },
-  routineCard: {
-    backgroundColor: '#FFF3E0',
-  },
   cardTitle: {
     fontSize: 24,
     fontWeight: 'bold',
@@ -171,9 +180,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 16,
   },
-  badgePeach: {
-    backgroundColor: '#FFE0B2',
-  },
   badgeText: {
     fontSize: 12,
     color: '#2C2C2C',
@@ -192,31 +198,76 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  statsBar: {
-    flexDirection: 'row',
-    backgroundColor: '#FEFEFE',
+  recentAnalysisCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 20,
     marginHorizontal: 20,
-    marginTop: 24,
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
+    marginTop: 20,
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+  },
+  recentHeader: {
+    flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '100%',
-    maxWidth: 760,
-    alignSelf: 'center',
-  },
-  statItem: {
-    flex: 1,
     alignItems: 'center',
+    marginBottom: 12,
   },
-  statDivider: {
-    width: 1,
-    height: 16,
-    backgroundColor: '#E5E7EB',
+  recentTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
   },
-  statText: {
+  recentTime: {
     fontSize: 12,
     color: '#6B7280',
+  },
+  recentContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+    marginBottom: 12,
+  },
+  scoreCircle: {
+    alignItems: 'center',
+  },
+  scoreNumber: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#1F2937',
+  },
+  scoreLabel: {
+    fontSize: 11,
+    color: '#6B7280',
+    marginTop: 2,
+  },
+  recentInfo: {
+    flex: 1,
+  },
+  recentSkinType: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: 4,
+  },
+  recentConcerns: {
+    fontSize: 12,
+    color: '#6B7280',
+  },
+  viewResultsButton: {
+    paddingVertical: 8,
+  },
+  viewResultsText: {
+    fontSize: 14,
+    color: '#2563EB',
+    fontWeight: '600',
+  },
+  comingSoonText: {
+    textAlign: 'center',
+    fontSize: 14,
+    color: '#9CA3AF',
+    marginTop: 32,
+    marginBottom: 20,
   },
   bottomNav: {
     position: 'absolute',
