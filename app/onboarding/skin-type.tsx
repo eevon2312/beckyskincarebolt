@@ -1,104 +1,86 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ArrowLeft, ArrowRight, Droplet, Sun, Wind, Star } from 'lucide-react-native';
+import { useOnboarding } from '@/contexts/OnboardingContext';
+import { Typewriter } from '@/components/Typewriter';
 
-const { width } = Dimensions.get('window');
-const isDesktop = width > 768;
-const cardSize = isDesktop ? 180 : Math.min((width - 64) / 2, 160);
-
-type SkinType = 'oily' | 'dry' | 'combo' | 'sensitive' | null;
+const skinTypes = [
+  'Oily',
+  'Dry',
+  'Combination',
+  'Normal',
+  'Sensitive',
+  "I'm not sure",
+];
 
 export default function SkinTypeOnboarding() {
   const router = useRouter();
-  const [selectedType, setSelectedType] = useState<SkinType>(null);
+  const { updateData } = useOnboarding();
+  const [selectedType, setSelectedType] = useState<string>('');
 
   const handleNext = () => {
     if (selectedType) {
-      router.push('/onboarding/concerns');
+      updateData({ skinType: selectedType });
+      router.push('/onboarding/sensitivities');
     }
   };
 
-  const skinTypes = [
-    { id: 'oily', label: 'Oily', icon: Droplet },
-    { id: 'dry', label: 'Dry', icon: Sun },
-    { id: 'combo', label: 'Combo', icon: Wind },
-    { id: 'sensitive', label: 'Sens', icon: Star },
-  ] as const;
-
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <ArrowLeft color="#2C2C2C" size={24} strokeWidth={2} />
-        </TouchableOpacity>
-
-        <View style={styles.progressContainer}>
-          <View style={styles.progressBar}>
-            <View style={[styles.progressFill, { width: '20%' }]} />
-          </View>
-        </View>
-
-        <Text style={styles.progressText}>1/5</Text>
-      </View>
-
-      <View style={styles.content}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.titleSection}>
-          <Text style={styles.title}>Let's personalize your experience</Text>
-          <Text style={styles.subtitle}>What's your skin type?</Text>
+          <Typewriter
+            text="How would you describe your skin most days?"
+            speed={50}
+            style={styles.title}
+          />
         </View>
 
-        <View style={styles.grid}>
+        <View style={styles.cardsContainer}>
           {skinTypes.map((type) => {
-            const Icon = type.icon;
-            const isSelected = selectedType === type.id;
+            const isSelected = selectedType === type;
 
             return (
               <TouchableOpacity
-                key={type.id}
+                key={type}
                 style={[
                   styles.card,
                   isSelected && styles.cardSelected,
                 ]}
-                onPress={() => setSelectedType(type.id as SkinType)}
+                onPress={() => setSelectedType(type)}
                 activeOpacity={0.7}
               >
-                <View style={[
-                  styles.iconBackground,
-                  isSelected && styles.iconBackgroundSelected,
-                ]}>
-                  <Icon
-                    color={isSelected ? '#A8C8A5' : '#9CA3AF'}
-                    size={32}
-                    strokeWidth={2}
-                  />
-                </View>
                 <Text style={[
-                  styles.cardLabel,
-                  isSelected && styles.cardLabelSelected,
+                  styles.cardText,
+                  isSelected && styles.cardTextSelected,
                 ]}>
-                  {type.label}
+                  {type}
                 </Text>
               </TouchableOpacity>
             );
           })}
         </View>
-      </View>
+      </ScrollView>
 
       <View style={styles.footer}>
         <TouchableOpacity
           style={[
             styles.nextButton,
-            selectedType && styles.nextButtonActive,
+            !selectedType && styles.nextButtonDisabled,
           ]}
           onPress={handleNext}
           disabled={!selectedType}
         >
-          <Text style={styles.nextButtonText}>Next</Text>
-          <ArrowRight color="#FFFFFF" size={20} strokeWidth={2} />
+          <Text style={[
+            styles.nextButtonText,
+            !selectedType && styles.nextButtonTextDisabled,
+          ]}>
+            Next
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -110,44 +92,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F2E8D8',
   },
-  header: {
-    height: 60,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 10,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  progressContainer: {
+  scrollView: {
     flex: 1,
-    paddingHorizontal: 16,
-  },
-  progressBar: {
-    height: 3,
-    backgroundColor: '#E5E7EB',
-    borderRadius: 2,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: '#A8C8A5',
-  },
-  progressText: {
-    fontSize: 14,
-    color: '#6B7280',
-    width: 40,
-    textAlign: 'right',
   },
   content: {
-    flex: 1,
-    paddingHorizontal: 24,
-    paddingVertical: 40,
-    maxWidth: 800,
+    paddingHorizontal: 32,
+    paddingTop: 100,
+    paddingBottom: 120,
+    maxWidth: 600,
     width: '100%',
     alignSelf: 'center',
   },
@@ -155,81 +107,62 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
+    fontSize: 24,
+    lineHeight: 34,
     color: '#2C2C2C',
-    textAlign: 'center',
-    marginBottom: 16,
-    lineHeight: 40,
+    fontWeight: '500',
   },
-  subtitle: {
-    fontSize: 18,
-    color: '#6B7280',
-    textAlign: 'center',
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 16,
-    justifyContent: 'center',
+  cardsContainer: {
+    gap: 12,
   },
   card: {
-    width: cardSize,
-    height: cardSize,
-    backgroundColor: '#FEFEFE',
-    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
     borderWidth: 2,
-    borderColor: '#D1D5DB',
+    borderColor: '#E5E7EB',
     padding: 20,
-    justifyContent: 'center',
     alignItems: 'center',
   },
   cardSelected: {
-    borderColor: '#A8C8A5',
-    backgroundColor: '#A8C8A510',
+    borderColor: '#2C2C2C',
+    backgroundColor: '#F9FAFB',
   },
-  iconBackground: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: '#E5E7EB',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  iconBackgroundSelected: {
-    backgroundColor: '#A8C8A520',
-  },
-  cardLabel: {
+  cardText: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: '500',
     color: '#2C2C2C',
   },
-  cardLabelSelected: {
-    color: '#2C2C2C',
+  cardTextSelected: {
+    fontWeight: 'bold',
   },
   footer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     paddingHorizontal: 24,
-    paddingBottom: 24,
-    maxWidth: 800,
-    width: '100%',
-    alignSelf: 'center',
+    paddingBottom: 40,
+    backgroundColor: '#F2E8D8',
+    alignItems: 'center',
   },
   nextButton: {
     height: 56,
-    backgroundColor: '#9CA3AF',
+    backgroundColor: '#2C2C2C',
     borderRadius: 12,
-    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
+    width: '100%',
+    maxWidth: 600,
   },
-  nextButtonActive: {
-    backgroundColor: '#2C2C2C',
+  nextButtonDisabled: {
+    backgroundColor: '#E5E7EB',
   },
   nextButtonText: {
     color: '#FFFFFF',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
+  },
+  nextButtonTextDisabled: {
+    color: '#9CA3AF',
   },
 });

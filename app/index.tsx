@@ -51,7 +51,7 @@ export default function Welcome() {
       <View style={styles.ctaSection}>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => router.push('/onboarding/skin-type')}
+          onPress={() => router.push('/onboarding/intro1')}
         >
           <Text style={styles.buttonText}>Get Started</Text>
         </TouchableOpacity>

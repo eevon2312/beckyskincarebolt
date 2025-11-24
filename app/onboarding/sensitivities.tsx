@@ -4,32 +4,38 @@ import { useRouter } from 'expo-router';
 import { useOnboarding } from '@/contexts/OnboardingContext';
 import { Typewriter } from '@/components/Typewriter';
 
-const concerns = [
-  'Breakouts/Acne',
-  'Sensitivity or irritation',
-  'Dryness or tightness',
-  'Oiliness or shine',
-  'Dark spots or uneven tone',
-  'Fine lines or ageing',
-  "I'm just curious",
+const sensitivityOptions = [
+  'Fragrance',
+  'Alcohol',
+  'Exfoliating acids (AHA/BHA)',
+  'Retinol',
+  "I'm not sure",
+  'None of these',
 ];
 
-export default function ConcernsOnboarding() {
+export default function SensitivitiesScreen() {
   const router = useRouter();
-  const { data, updateData } = useOnboarding();
-  const [selectedConcerns, setSelectedConcerns] = useState<string[]>([]);
+  const { updateData } = useOnboarding();
+  const [selectedSensitivities, setSelectedSensitivities] = useState<string[]>([]);
 
-  const toggleConcern = (concern: string) => {
-    setSelectedConcerns((prev) =>
-      prev.includes(concern)
-        ? prev.filter((c) => c !== concern)
-        : [...prev, concern]
-    );
+  const toggleSensitivity = (sensitivity: string) => {
+    setSelectedSensitivities((prev) => {
+      if (sensitivity === 'None of these') {
+        return prev.includes(sensitivity) ? [] : [sensitivity];
+      }
+
+      const filtered = prev.filter(s => s !== 'None of these');
+
+      if (prev.includes(sensitivity)) {
+        return filtered.filter((s) => s !== sensitivity);
+      }
+      return [...filtered, sensitivity];
+    });
   };
 
   const handleNext = () => {
-    updateData({ concerns: selectedConcerns });
-    router.push('/onboarding/skin-type');
+    updateData({ sensitivities: selectedSensitivities });
+    router.push('/onboarding/photo');
   };
 
   return (
@@ -40,33 +46,33 @@ export default function ConcernsOnboarding() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.titleSection}>
-          <Text style={styles.greeting}>Hi {data.name},</Text>
           <Typewriter
-            text="What does your skin need help with right now?"
+            text="Is your skin sensitive to anything?"
             speed={50}
             style={styles.title}
           />
+          <Text style={styles.subtitle}>This helps Becky keep your suggestions gentle.</Text>
         </View>
 
-        <View style={styles.pillsContainer}>
-          {concerns.map((concern) => {
-            const isSelected = selectedConcerns.includes(concern);
+        <View style={styles.chipsContainer}>
+          {sensitivityOptions.map((sensitivity) => {
+            const isSelected = selectedSensitivities.includes(sensitivity);
 
             return (
               <TouchableOpacity
-                key={concern}
+                key={sensitivity}
                 style={[
-                  styles.pill,
-                  isSelected && styles.pillSelected,
+                  styles.chip,
+                  isSelected && styles.chipSelected,
                 ]}
-                onPress={() => toggleConcern(concern)}
+                onPress={() => toggleSensitivity(sensitivity)}
                 activeOpacity={0.7}
               >
                 <Text style={[
-                  styles.pillText,
-                  isSelected && styles.pillTextSelected,
+                  styles.chipText,
+                  isSelected && styles.chipTextSelected,
                 ]}>
-                  {concern}
+                  {sensitivity}
                 </Text>
               </TouchableOpacity>
             );
@@ -76,13 +82,10 @@ export default function ConcernsOnboarding() {
 
       <View style={styles.footer}>
         <TouchableOpacity
-          style={[styles.nextButton, selectedConcerns.length === 0 && styles.nextButtonDisabled]}
+          style={styles.nextButton}
           onPress={handleNext}
-          disabled={selectedConcerns.length === 0}
         >
-          <Text style={[styles.nextButtonText, selectedConcerns.length === 0 && styles.nextButtonTextDisabled]}>
-            Next
-          </Text>
+          <Text style={styles.nextButtonText}>Next</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -108,41 +111,41 @@ const styles = StyleSheet.create({
   titleSection: {
     marginBottom: 40,
   },
-  greeting: {
-    fontSize: 28,
-    fontWeight: 'bold',
+  title: {
+    fontSize: 24,
+    lineHeight: 34,
     color: '#2C2C2C',
+    fontWeight: '500',
     marginBottom: 16,
   },
-  title: {
-    fontSize: 20,
+  subtitle: {
+    fontSize: 16,
     color: '#6B7280',
-    lineHeight: 30,
+    lineHeight: 24,
   },
-  pillsContainer: {
+  chipsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'center',
     gap: 12,
   },
-  pill: {
-    paddingVertical: 14,
-    paddingHorizontal: 28,
+  chip: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
     borderRadius: 9999,
     borderWidth: 2,
     borderColor: '#D1D5DB',
-    backgroundColor: '#FEFEFE',
+    backgroundColor: '#FFFFFF',
   },
-  pillSelected: {
+  chipSelected: {
     backgroundColor: '#2C2C2C',
     borderColor: '#2C2C2C',
   },
-  pillText: {
-    fontSize: 16,
+  chipText: {
+    fontSize: 15,
     fontWeight: '500',
     color: '#2C2C2C',
   },
-  pillTextSelected: {
+  chipTextSelected: {
     color: '#FFFFFF',
   },
   footer: {
@@ -151,7 +154,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     paddingHorizontal: 24,
-    paddingBottom: 24,
+    paddingBottom: 40,
     backgroundColor: '#F2E8D8',
     alignItems: 'center',
   },
@@ -164,15 +167,9 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 600,
   },
-  nextButtonDisabled: {
-    backgroundColor: '#E5E7EB',
-  },
   nextButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  nextButtonTextDisabled: {
-    color: '#9CA3AF',
   },
 });
