@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, Check, AlertCircle, AlertTriangle, Package, Share2 } from 'lucide-react-native';
 import Animated, {
@@ -365,20 +365,12 @@ export default function SkinResults() {
           <Text style={styles.primaryButtonText}>Done - Back to Home</Text>
         </TouchableOpacity>
 
-        <View style={styles.secondaryButtons}>
-          <TouchableOpacity
-            style={styles.secondaryButton}
-            onPress={() => router.push('/skin-check')}
-          >
-            <Text style={styles.secondaryButtonText}>Start New Analysis</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.secondaryButton}
-            onPress={() => Alert.alert('Share Results', 'Share functionality coming soon!')}
-          >
-            <Text style={styles.secondaryButtonText}>Share Results</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          style={[styles.secondaryButton, { marginTop: 12 }]}
+          onPress={() => router.push('/skin-check')}
+        >
+          <Text style={styles.secondaryButtonText}>Start New Analysis</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );

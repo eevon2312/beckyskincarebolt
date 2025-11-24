@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Play, Clock, Droplet, MoreVertical, AlertCircle, Lightbulb, CheckCircle } from 'lucide-react-native';
+import { Play, Clock, Droplet, MoreVertical, AlertCircle, Lightbulb, CheckCircle, ArrowLeft, Share2 } from 'lucide-react-native';
 import storage from '../src/utils/storage';
 
 type RoutineStep = {
@@ -113,14 +113,14 @@ export default function RoutineResults() {
         contentContainerStyle={styles.scrollContent}
       >
         <View style={styles.header}>
-          <View style={styles.headerLeft}>
-            <Text style={styles.headerTitle}>Your Routine</Text>
+          <TouchableOpacity onPress={() => router.push('/home')} style={styles.backButton}>
+            <ArrowLeft color="#2C2C2C" size={24} strokeWidth={2} />
+          </TouchableOpacity>
+          <View style={styles.headerText}>
+            <Text style={styles.headerTitle}>Your Action Plan</Text>
+            <Text style={styles.subtitle}>Based on your skin analysis</Text>
           </View>
         </View>
-
-        <Text style={styles.subtitle}>
-          Here's your personalized skincare plan.
-        </Text>
 
         {/* Key Insights Section */}
         {suggestions.length > 0 && (
@@ -245,8 +245,36 @@ export default function RoutineResults() {
           })}
         </View>
 
-        <View style={{ height: 100 }} />
+        <View style={{ height: 240 }} />
       </ScrollView>
+
+      <View style={styles.bottomActions}>
+        <TouchableOpacity
+          style={styles.primaryButton}
+          onPress={() => router.push('/home')}
+        >
+          <Text style={styles.primaryButtonText}>Done - Back to Home</Text>
+        </TouchableOpacity>
+
+        <View style={styles.secondaryButtons}>
+          <TouchableOpacity
+            style={styles.secondaryButton}
+            onPress={() => router.push('/scan-products')}
+          >
+            <Text style={styles.secondaryButtonText}>Scan Products</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.secondaryButton}
+            onPress={() => {
+              // Share functionality placeholder
+              console.log('Share routine');
+            }}
+          >
+            <Text style={styles.secondaryButtonText}>Share</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </View>
   );
 }
@@ -254,7 +282,7 @@ export default function RoutineResults() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F2E8D8',
   },
   scrollView: {
     flex: 1,
@@ -268,44 +296,53 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     padding: 20,
     paddingTop: 60,
   },
-  headerLeft: {
-    flexDirection: 'row',
+  backButton: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 12,
+    marginRight: 12,
+  },
+  headerText: {
     flex: 1,
   },
   headerTitle: {
-    fontSize: 28,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#2C2C2C',
+    marginBottom: 4,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 12,
     color: '#6B7280',
-    paddingHorizontal: 20,
-    marginBottom: 24,
   },
   section: {
     paddingHorizontal: 20,
     marginBottom: 24,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#1F2937',
-    marginBottom: 12,
+    color: '#2C2C2C',
+    marginBottom: 16,
   },
   insightCard: {
-    backgroundColor: '#F3E8FF',
+    backgroundColor: '#FFFFFF',
     borderLeftWidth: 4,
     borderLeftColor: '#8B5CF6',
-    padding: 16,
-    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#E9D5FF',
+    padding: 20,
+    borderRadius: 24,
     marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
   insightHeader: {
     flexDirection: 'row',
@@ -316,32 +353,39 @@ const styles = StyleSheet.create({
   insightTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#6B21A8',
+    color: '#2C2C2C',
     flex: 1,
   },
   insightProducts: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#7C3AED',
+    color: '#6B7280',
     marginBottom: 8,
   },
   insightDescription: {
     fontSize: 14,
-    color: '#5B21B6',
+    color: '#374151',
     lineHeight: 20,
     marginBottom: 8,
   },
   insightRecommendation: {
     fontSize: 14,
-    color: '#6D28D9',
+    color: '#2C2C2C',
     fontWeight: '600',
   },
   missingCard: {
-    backgroundColor: '#D1FAE5',
+    backgroundColor: '#FFFFFF',
     borderLeftWidth: 4,
     borderLeftColor: '#10B981',
-    padding: 16,
-    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#D1FAE5',
+    padding: 20,
+    borderRadius: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
   missingItem: {
     marginBottom: 16,
@@ -355,11 +399,11 @@ const styles = StyleSheet.create({
   missingCategory: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#065F46',
+    color: '#2C2C2C',
   },
   missingReason: {
     fontSize: 14,
-    color: '#047857',
+    color: '#374151',
     lineHeight: 20,
   },
   timeToggle: {
@@ -377,10 +421,10 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   timeTabActiveAM: {
-    borderBottomColor: '#0D9488',
+    borderBottomColor: '#2C2C2C',
   },
   timeTabActivePM: {
-    borderBottomColor: '#6366F1',
+    borderBottomColor: '#2C2C2C',
   },
   timeTabText: {
     fontSize: 16,
@@ -388,15 +432,23 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
   },
   timeTabTextActive: {
-    color: '#1F2937',
+    color: '#2C2C2C',
   },
   routineSteps: {
     paddingHorizontal: 20,
   },
   stepCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 20,
     flexDirection: 'row',
     gap: 16,
-    marginBottom: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
   stepLeft: {
     alignItems: 'center',
@@ -409,13 +461,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   stepNumberAM: {
-    backgroundColor: '#0D9488',
+    backgroundColor: '#A8C8A5',
   },
   stepNumberPM: {
-    backgroundColor: '#6366F1',
+    backgroundColor: '#A8C8A5',
   },
   stepNumberText: {
-    color: '#FFFFFF',
+    color: '#2C2C2C',
     fontSize: 18,
     fontWeight: 'bold',
   },
@@ -503,6 +555,52 @@ const styles = StyleSheet.create({
   errorButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
+    fontWeight: '600',
+  },
+  bottomActions: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#F2E8D8',
+    padding: 20,
+    paddingBottom: 40,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+    maxWidth: 900,
+    width: '100%',
+    alignSelf: 'center',
+  },
+  primaryButton: {
+    backgroundColor: '#2C2C2C',
+    height: 56,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  primaryButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  secondaryButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  secondaryButton: {
+    flex: 1,
+    height: 48,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#2C2C2C',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+  },
+  secondaryButtonText: {
+    color: '#2C2C2C',
+    fontSize: 14,
     fontWeight: '600',
   },
 });
