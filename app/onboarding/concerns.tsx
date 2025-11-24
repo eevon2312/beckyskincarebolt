@@ -27,7 +27,7 @@ export default function ConcernsOnboarding() {
   };
 
   const handleNext = () => {
-    router.push('/home');
+    router.push('/skin-check');
   };
 
   return (
