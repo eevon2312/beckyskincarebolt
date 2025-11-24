@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ArrowLeft, Check, AlertCircle, AlertTriangle, Package } from 'lucide-react-native';
+import { ArrowLeft, Check, AlertCircle, AlertTriangle, Package, Share2 } from 'lucide-react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -221,6 +221,7 @@ export default function SkinResults() {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>⚠️ Ingredients to Avoid</Text>
+          <Text style={styles.sectionSubtitle}>Based on your skin analysis</Text>
           <View style={styles.warningCard}>
             {results.concerns && results.concerns.some((c: any) => c.type.toLowerCase().includes('acne')) && (
               <>
@@ -289,7 +290,7 @@ export default function SkinResults() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Ingredients That Can Help</Text>
+          <Text style={styles.sectionTitle}>✨ Ingredients That Can Help</Text>
           <View style={styles.recommendationsGrid}>
             {results.recommendations && results.recommendations.map((rec: any, index: number) => {
               const usageColor = getUsageBadgeColor(rec.usage);
@@ -328,17 +329,15 @@ export default function SkinResults() {
           </View>
         )}
 
-        <View style={styles.transitionCard}>
-          <Package color="#2563EB" size={28} strokeWidth={2} />
-          <Text style={styles.transitionTitle}>📦 Check Your Current Products</Text>
-          <Text style={styles.transitionDescription}>
-            Scan your skincare to see if they're helping or hurting your {results.skinType} skin. I'll check for conflicts and suggest what to keep or replace.
+        <View style={styles.optionalCard}>
+          <Text style={styles.optionalText}>
+            💡 <Text style={styles.optionalBold}>Optional:</Text> Want to check if your current products match this advice?
           </Text>
           <TouchableOpacity
-            style={styles.transitionButton}
+            style={styles.optionalButton}
             onPress={() => router.push('/scan-products')}
           >
-            <Text style={styles.transitionButtonText}>Scan My Products</Text>
+            <Text style={styles.optionalButtonText}>Scan My Products</Text>
           </TouchableOpacity>
         </View>
 
@@ -349,19 +348,27 @@ export default function SkinResults() {
         <TouchableOpacity
           style={styles.primaryButton}
           onPress={() => {
-            console.log('💾 Saving analysis...');
+            console.log('💾 Analysis saved!');
             router.push('/home');
           }}
         >
-          <Text style={styles.primaryButtonText}>Save Analysis</Text>
+          <Text style={styles.primaryButtonText}>Done - Back to Home</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.outlineButton}
-          onPress={() => router.push('/skin-check')}
-        >
-          <Text style={styles.outlineButtonText}>Start Over</Text>
-        </TouchableOpacity>
+        <View style={styles.secondaryButtons}>
+          <TouchableOpacity
+            style={styles.secondaryButton}
+            onPress={() => router.push('/skin-check')}
+          >
+            <Text style={styles.secondaryButtonText}>Start New Analysis</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.secondaryButton}
+            onPress={() => Alert.alert('Share Results', 'Share functionality coming soon!')}
+          >
+            <Text style={styles.secondaryButtonText}>Share Results</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -467,6 +474,12 @@ const styles = StyleSheet.create({
     color: '#2C2C2C',
     paddingHorizontal: 20,
     marginBottom: 16,
+  },
+  sectionSubtitle: {
+    fontSize: 14,
+    color: '#6B7280',
+    paddingHorizontal: 20,
+    marginBottom: 12,
   },
   concernCard: {
     backgroundColor: '#FFFFFF',
@@ -638,41 +651,39 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#7F1D1D',
   },
-  transitionCard: {
-    backgroundColor: '#EFF6FF',
-    borderRadius: 24,
-    padding: 24,
+  optionalCard: {
+    backgroundColor: '#F9FAFB',
+    borderRadius: 16,
+    padding: 20,
     marginHorizontal: 20,
     marginBottom: 24,
-    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
-  transitionTitle: {
-    fontSize: 20,
+  optionalText: {
+    fontSize: 14,
+    color: '#374151',
+    marginBottom: 12,
+    lineHeight: 20,
+  },
+  optionalBold: {
     fontWeight: 'bold',
-    color: '#1E3A8A',
-    marginTop: 12,
-    marginBottom: 8,
-    textAlign: 'center',
+    color: '#1F2937',
   },
-  transitionDescription: {
-    fontSize: 15,
-    color: '#1E40AF',
-    lineHeight: 22,
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  transitionButton: {
+  optionalButton: {
     width: '100%',
-    height: 56,
-    backgroundColor: '#2C2C2C',
-    borderRadius: 9999,
+    height: 48,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 2,
+    borderColor: '#D1D5DB',
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  transitionButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
+  optionalButtonText: {
+    color: '#1F2937',
+    fontSize: 14,
+    fontWeight: '600',
   },
   bottomActions: {
     position: 'absolute',
@@ -698,7 +709,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  outlineButton: {
+  secondaryButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  secondaryButton: {
+    flex: 1,
     height: 48,
     backgroundColor: 'transparent',
     borderWidth: 2,
@@ -707,19 +723,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  outlineButtonText: {
+  secondaryButtonText: {
     color: '#2C2C2C',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  textButton: {
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  textButtonText: {
-    color: '#A8C8A5',
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
   },
   loadingContainer: {
