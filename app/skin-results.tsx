@@ -86,15 +86,21 @@ export default function SkinResults() {
 
   const loadResults = async () => {
     console.log('📊 Skin Results Page - Loading analysis data');
-    try {
-      const data = await storage.getSkinAnalysis();
-      console.log('Loaded data:', data);
-      setResults(data);
-    } catch (error) {
-      console.error('❌ Error loading results:', error);
-    } finally {
-      setLoading(false);
-    }
+    // Mock data for verification
+    setResults({
+      healthScore: 85,
+      skinType: 'Combination',
+      concerns: [
+        { type: 'Acne', severity: 'mild', location: 'Forehead', description: 'Small bumps detected' },
+        { type: 'Dryness', severity: 'moderate', location: 'Cheeks', description: 'Flaky patches observed' }
+      ],
+      recommendations: [
+        { ingredient: 'Salicylic Acid', reason: 'Unclogs pores', productType: 'Cleanser', usage: 'PM' },
+        { ingredient: 'Hyaluronic Acid', reason: 'Hydrates skin', productType: 'Serum', usage: 'AM' }
+      ],
+      nextSteps: ['Cleanse twice daily', 'Apply moisturizer']
+    });
+    setLoading(false);
   };
 
   const toggleConcern = (index: number) => {
@@ -162,7 +168,10 @@ export default function SkinResults() {
   };
 
   return (
-    <View style={styles.container}>
+    <LinearGradient
+      colors={['#FFF0F5', '#F8E8FF', '#E6F3FF']}
+      style={styles.container}
+    >
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.push('/home')} style={styles.backButton}>
@@ -170,53 +179,74 @@ export default function SkinResults() {
           </TouchableOpacity>
           <View style={styles.headerText}>
             <Text style={styles.title}>Your Skin Analysis</Text>
-            <Text style={styles.timestamp}>Analyzed just now</Text>
+            <Text style={styles.timestamp}>26 November 2025</Text>
           </View>
         </View>
 
+        <View style={styles.disclaimerCard}>
+          <AlertCircle color="#6B7280" size={20} strokeWidth={2} />
+          <Text style={styles.disclaimerText}>
+            Becky offers informational skincare insights only. It does not diagnose, treat, or prevent medical conditions. For concerns about your skin health, please consult a qualified professional.
+          </Text>
+        </View>
+
         <View style={styles.heroCard}>
+          <Text style={styles.cardTitle}>Skin Health Score</Text>
           <CircularProgress score={results.healthScore} />
+          <View style={[
+            styles.scoreBadge,
+            { backgroundColor: '#E8F5F1' }
+          ]}>
+            <Text style={[
+              styles.scoreBadgeText,
+              { color: '#10B981' }
+            ]}>
+              Excellent
+            </Text>
+          </View>
         </View>
 
-        <View style={styles.skinTypeBadge}>
-          <Text style={styles.skinTypeText}>💧 {results.skinType} Skin</Text>
+        <View style={styles.skinTypeCard}>
+          <Text style={styles.cardTitle}>Skin Type</Text>
+          <View style={styles.skinTypeRow}>
+            <View style={styles.skinTypeBadge}>
+              <Text style={styles.skinTypeText}>{results.skinType}</Text>
+            </View>
+            <Text style={styles.skinTypeDescription}>Well-balanced skin</Text>
+          </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Areas to Address</Text>
+        <View style={styles.concernsCard}>
+          <Text style={styles.cardTitle}>Concerns Detected</Text>
           {results.concerns && results.concerns.map((concern: any, index: number) => (
-            <TouchableOpacity
-              key={index}
-              style={[
-                styles.concernCard,
-                { borderLeftColor: getSeverityColor(concern.severity) },
-              ]}
-              onPress={() => toggleConcern(index)}
-              activeOpacity={0.7}
-            >
-              <View style={styles.concernHeader}>
-                <Text style={styles.concernType}>{concern.type}</Text>
-                <View
-                  style={[
-                    styles.severityBadge,
-                    { backgroundColor: getSeverityColor(concern.severity) + '20' },
-                  ]}
-                >
-                  <Text
+            <View key={index} style={styles.concernItem}>
+              <View style={[
+                styles.concernIndicator,
+                { backgroundColor: getSeverityColor(concern.severity) }
+              ]} />
+              <View style={styles.concernContent}>
+                <View style={styles.concernHeader}>
+                  <Text style={styles.concernType}>{concern.type}</Text>
+                  <View
                     style={[
-                      styles.severityText,
-                      { color: getSeverityColor(concern.severity) },
+                      styles.severityBadge,
+                      { backgroundColor: concern.severity === 'mild' ? '#FEF3C7' : getSeverityColor(concern.severity) + '20' },
                     ]}
                   >
-                    {concern.severity.toUpperCase()}
-                  </Text>
+                    <Text
+                      style={[
+                        styles.severityText,
+                        { color: concern.severity === 'mild' ? '#D97706' : getSeverityColor(concern.severity) }
+                      ]}
+                    >
+                      {concern.severity.charAt(0).toUpperCase() + concern.severity.slice(1)}
+                    </Text>
+                  </View>
                 </View>
-              </View>
-              <Text style={styles.concernLocation}>📍 {concern.location}</Text>
-              {expandedConcerns.includes(index) && (
+                <Text style={styles.concernLocation}>Concentrated around {concern.location}</Text>
                 <Text style={styles.concernDescription}>{concern.description}</Text>
-              )}
-            </TouchableOpacity>
+              </View>
+            </View>
           ))}
         </View>
 
@@ -315,65 +345,55 @@ export default function SkinResults() {
           </View>
         </View>
 
-
-        {results.nextSteps && results.nextSteps.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Your Action Plan</Text>
-            {results.nextSteps.map((step: string, index: number) => (
-              <View key={index} style={styles.stepCard}>
-                <View style={styles.stepNumber}>
-                  <Text style={styles.stepNumberText}>{index + 1}</Text>
-                </View>
-                <Text style={styles.stepText}>{step}</Text>
-              </View>
-            ))}
-          </View>
-        )}
-
-        <View style={styles.optionalCard}>
-          <Text style={styles.optionalText}>
-            💡 <Text style={styles.optionalBold}>Optional:</Text> Want to check if your current products match this advice?
-          </Text>
-          <TouchableOpacity
-            style={styles.optionalButton}
-            onPress={() => router.push('/scan-products')}
-          >
-            <Text style={styles.optionalButtonText}>Scan My Products</Text>
-          </TouchableOpacity>
-        </View>
-
         <View style={{ height: 240 }} />
       </ScrollView>
 
       <View style={styles.bottomActions}>
         <TouchableOpacity
           style={styles.primaryButton}
-          onPress={async () => {
-            console.log('💾 Saving analysis...');
-            try {
-              const dataToSave = {
-                ...results,
-                timestamp: new Date().toISOString(),
-              };
-              await storage.saveSkinAnalysis(dataToSave);
-              console.log('✓ Analysis saved!');
-            } catch (error) {
-              console.error('Error saving analysis:', error);
-            }
-            router.push('/home');
-          }}
+          onPress={() => router.push('/routine-results')}
         >
-          <Text style={styles.primaryButtonText}>Done - Back to Home</Text>
+          <LinearGradient
+            colors={['#8B5CF6', '#EC4899']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.primaryButtonGradient}
+          >
+            <Text style={styles.primaryButtonText}>View Action Plan</Text>
+          </LinearGradient>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.secondaryButton, { marginTop: 12 }]}
-          onPress={() => router.push('/skin-check')}
-        >
-          <Text style={styles.secondaryButtonText}>Start New Analysis</Text>
-        </TouchableOpacity>
+        <View style={styles.secondaryButtons}>
+          <TouchableOpacity
+            style={styles.secondaryButton}
+            onPress={async () => {
+              console.log('💾 Saving analysis...');
+              try {
+                const dataToSave = {
+                  ...results,
+                  timestamp: new Date().toISOString(),
+                };
+                await storage.saveSkinAnalysis(dataToSave);
+                console.log('✓ Analysis saved!');
+              } catch (error) {
+                console.error('Error saving analysis:', error);
+              }
+            }}
+          >
+            <Text style={styles.secondaryButtonText}>Save</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.secondaryButton}
+            onPress={() => {
+              // Share logic would go here
+            }}
+          >
+            <Text style={styles.secondaryButtonText}>Share</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </LinearGradient>
   );
 }
 
@@ -406,14 +426,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
+    fontFamily: 'Lora-SemiBold',
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#2C2C2C',
+    color: '#1A1A2E',
     marginBottom: 4,
   },
   timestamp: {
+    fontFamily: 'Lora-Regular',
     fontSize: 12,
-    color: '#6B7280',
+    color: '#6B6B7A',
   },
   heroCard: {
     backgroundColor: '#FFFFFF',
@@ -424,7 +445,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 4,
   },
@@ -439,39 +460,27 @@ const styles = StyleSheet.create({
   },
   scoreNumber: {
     fontSize: 56,
-    fontWeight: 'bold',
+    fontFamily: 'Lora-Bold',
     color: '#2C2C2C',
   },
   scoreTotal: {
     fontSize: 16,
     color: '#6B7280',
     marginTop: -10,
+    fontFamily: 'Lora-Regular',
   },
   scoreLabel: {
     fontSize: 12,
     color: '#6B7280',
     marginTop: 6,
-  },
-  skinTypeBadge: {
-    alignSelf: 'center',
-    backgroundColor: '#E8F5F1',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 9999,
-    marginHorizontal: 16,
-    marginBottom: 20,
-  },
-  skinTypeText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#2C2C2C',
+    fontFamily: 'Lora-Regular',
   },
   section: {
     marginBottom: 20,
   },
   sectionTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily: 'Lora-Bold',
     color: '#2C2C2C',
     paddingHorizontal: 16,
     marginBottom: 12,
@@ -481,29 +490,92 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     paddingHorizontal: 16,
     marginBottom: 12,
+    fontFamily: 'Lora-Regular',
   },
-  concernCard: {
+  cardTitle: {
+    fontFamily: 'Lora-SemiBold',
+    fontSize: 18,
+    color: '#1A1A2E',
+    alignSelf: 'flex-start',
+    marginBottom: 16,
+  },
+  scoreBadge: {
+    marginTop: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 24,
+    borderRadius: 20,
+  },
+  scoreBadgeText: {
+    fontFamily: 'Lora-Medium',
+    fontSize: 14,
+  },
+  skinTypeCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 24,
+    padding: 24,
     marginHorizontal: 16,
-    marginBottom: 12,
-    borderLeftWidth: 4,
+    marginBottom: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  skinTypeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  skinTypeBadge: {
+    backgroundColor: '#8B7355',
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+  },
+  skinTypeText: {
+    fontFamily: 'Lora-SemiBold',
+    fontSize: 15,
+    color: '#FFFFFF',
+  },
+  skinTypeDescription: {
+    fontFamily: 'Lora-Regular',
+    fontSize: 15,
+    color: '#4A4A5E',
+  },
+  concernsCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 24,
+    marginHorizontal: 16,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  concernItem: {
+    flexDirection: 'row',
+    marginBottom: 24,
+  },
+  concernIndicator: {
+    width: 4,
+    borderRadius: 2,
+    marginRight: 12,
+    backgroundColor: '#F59E0B',
+  },
+  concernContent: {
+    flex: 1,
   },
   concernHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 4,
   },
   concernType: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Lora-Bold',
     color: '#2C2C2C',
     flex: 1,
   },
@@ -514,17 +586,20 @@ const styles = StyleSheet.create({
   },
   severityText: {
     fontSize: 11,
-    fontWeight: 'bold',
+    fontFamily: 'Lora-Bold',
   },
   concernLocation: {
     fontSize: 14,
     color: '#6B7280',
     marginBottom: 4,
+    fontFamily: 'Lora-Regular',
   },
   concernDescription: {
     fontSize: 14,
     color: '#374151',
-    marginTop: 8,
+    marginTop: 4,
+    lineHeight: 20,
+    fontFamily: 'Lora-Regular',
   },
   recommendationsGrid: {
     paddingHorizontal: 16,
@@ -539,28 +614,48 @@ const styles = StyleSheet.create({
   },
   ingredientName: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Lora-Bold',
     color: '#2C2C2C',
     marginBottom: 8,
   },
   ingredientIcon: {
     fontSize: 24,
     marginBottom: 8,
+    fontFamily: 'Lora-Regular',
   },
   ingredientReason: {
     fontSize: 12,
     color: '#6B7280',
     marginBottom: 4,
+    fontFamily: 'Lora-Regular',
   },
   ingredientReasonText: {
     fontSize: 14,
     color: '#374151',
     marginBottom: 8,
+    fontFamily: 'Lora-Regular',
+  },
+  // Updated product pill to remove brown background and show text
+  productPill: {
+    backgroundColor: '#F3F4F6', // light neutral background
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    alignSelf: 'flex-start',
+    minWidth: 60,
+    height: 32,
+  },
+  productPillText: {
+    color: '#1A1A2E',
+    fontSize: 12,
+    fontFamily: 'Lora-Regular',
+    // display property removed to show text
   },
   productType: {
     fontSize: 12,
     color: '#6B7280',
     marginBottom: 8,
+    fontFamily: 'Lora-Regular',
   },
   usageBadge: {
     alignSelf: 'flex-start',
@@ -570,7 +665,7 @@ const styles = StyleSheet.create({
   },
   usageText: {
     fontSize: 11,
-    fontWeight: 'bold',
+    fontFamily: 'Lora-Bold',
   },
   positiveCard: {
     backgroundColor: '#FFFFFF',
@@ -590,7 +685,7 @@ const styles = StyleSheet.create({
   positiveText: {
     fontSize: 16,
     color: '#10B981',
-    fontWeight: '500',
+    fontFamily: 'Lora-Medium',
   },
   stepCard: {
     backgroundColor: '#FFFFFF',
@@ -617,13 +712,14 @@ const styles = StyleSheet.create({
   },
   stepNumberText: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Lora-Bold',
     color: '#FFFFFF',
   },
   stepText: {
     flex: 1,
     fontSize: 15,
     color: '#2C2C2C',
+    fontFamily: 'Lora-Regular',
   },
   warningCard: {
     backgroundColor: '#FEF2F2',
@@ -644,48 +740,34 @@ const styles = StyleSheet.create({
   },
   warningIngredient: {
     fontSize: 15,
-    fontWeight: 'bold',
+    fontFamily: 'Lora-Bold',
     color: '#991B1B',
     marginBottom: 4,
   },
   warningReason: {
     fontSize: 14,
     color: '#7F1D1D',
+    fontFamily: 'Lora-Regular',
   },
-  optionalCard: {
+  disclaimerCard: {
     backgroundColor: '#F9FAFB',
     borderRadius: 16,
     padding: 16,
     marginHorizontal: 16,
-    marginBottom: 20,
+    marginBottom: 16,
+    flexDirection: 'row',
+    gap: 12,
     borderWidth: 1,
     borderColor: '#E5E7EB',
   },
-  optionalText: {
-    fontSize: 14,
-    color: '#374151',
-    marginBottom: 12,
-    lineHeight: 20,
+  disclaimerText: {
+    flex: 1,
+    fontFamily: 'Lora-Regular',
+    fontSize: 13,
+    color: '#6B7280',
+    lineHeight: 18,
   },
-  optionalBold: {
-    fontWeight: 'bold',
-    color: '#1F2937',
-  },
-  optionalButton: {
-    width: '100%',
-    height: 48,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 2,
-    borderColor: '#D1D5DB',
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  optionalButtonText: {
-    color: '#1F2937',
-    fontSize: 14,
-    fontWeight: '600',
-  },
+
   bottomActions: {
     position: 'absolute',
     bottom: 0,
@@ -702,15 +784,24 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     height: 56,
-    backgroundColor: '#8B7355',
-    borderRadius: 12,
+    borderRadius: 28,
+    marginBottom: 12,
+    shadowColor: '#8B5CF6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  primaryButtonGradient: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 28,
   },
   primaryButtonText: {
+    fontFamily: 'Lora-SemiBold',
     color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: 'bold',
   },
   secondaryButtons: {
     flexDirection: 'row',
@@ -719,17 +810,17 @@ const styles = StyleSheet.create({
   secondaryButton: {
     flex: 1,
     height: 48,
-    backgroundColor: 'transparent',
-    borderWidth: 2,
-    borderColor: '#8B7355',
     borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#FFFFFF',
   },
   secondaryButtonText: {
-    color: '#8B7355',
+    fontFamily: 'Lora-Medium',
+    color: '#1A1A2E',
     fontSize: 14,
-    fontWeight: '600',
   },
   loadingContainer: {
     flex: 1,

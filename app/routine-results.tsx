@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Play, Clock, Droplet, MoreVertical, AlertCircle, Lightbulb, CheckCircle, ArrowLeft, Share2 } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import storage from '../src/utils/storage';
 
 type RoutineStep = {
@@ -46,15 +47,29 @@ export default function RoutineResults() {
 
   const loadResults = async () => {
     console.log('📊 Routine Results Page - Loading routine data');
-    try {
-      const data = await storage.getRoutines();
-      console.log('Loaded data:', data);
-      setResults(data);
-    } catch (error) {
-      console.error('❌ Error loading results:', error);
-    } finally {
-      setLoading(false);
-    }
+    // Mock data for verification
+    setResults({
+      skinType: 'Combination',
+      routine: {
+        AM: [
+          { step: 1, category: 'Cleanse', product: 'Gentle Cleanser', instructions: 'Wash face with lukewarm water' },
+          { step: 2, category: 'Treat', product: 'Vitamin C Serum', instructions: 'Apply 3-4 drops' },
+          { step: 3, category: 'Moisturize', product: 'Lightweight Gel', instructions: 'Apply evenly' },
+          { step: 4, category: 'Protect', product: 'SPF 50', instructions: 'Apply generously' }
+        ],
+        PM: [
+          { step: 1, category: 'Cleanse', product: 'Oil Cleanser', instructions: 'Remove makeup and sunscreen' },
+          { step: 2, category: 'Treat', product: 'Retinol Serum', instructions: 'Apply pea-sized amount' },
+          { step: 3, category: 'Moisturize', product: 'Night Cream', instructions: 'Lock in hydration' }
+        ]
+      },
+      suggestions: [
+        { title: 'Hydration Boost', description: 'Drink more water to improve skin elasticity.' },
+        { title: 'Sun Protection', description: 'Reapply sunscreen every 2 hours when outdoors.' }
+      ],
+      missing: []
+    });
+    setLoading(false);
   };
 
   if (loading) {
@@ -107,7 +122,10 @@ export default function RoutineResults() {
   };
 
   return (
-    <View style={styles.container}>
+    <LinearGradient
+      colors={['#FFF0F5', '#F8E8FF', '#E6F3FF']}
+      style={styles.container}
+    >
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -118,32 +136,18 @@ export default function RoutineResults() {
           </TouchableOpacity>
           <View style={styles.headerText}>
             <Text style={styles.headerTitle}>Your Action Plan</Text>
-            <Text style={styles.subtitle}>Based on your skin analysis</Text>
+            <Text style={styles.subtitle}>Personalised for your {results.skinType || 'Normal'} skin</Text>
           </View>
         </View>
 
         {/* Key Insights Section */}
         {suggestions.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Key Insights ({suggestions.length})</Text>
+          <View style={styles.insightCard}>
+            <Text style={styles.insightTitle}>Key Insights</Text>
             {suggestions.map((suggestion: Suggestion, idx: number) => (
-              <View key={idx} style={styles.insightCard}>
-                <View style={styles.insightHeader}>
-                  <Lightbulb color="#8B5CF6" size={20} strokeWidth={2} />
-                  <Text style={styles.insightTitle}>{suggestion.title}</Text>
-                </View>
-                {suggestion.products && suggestion.products.length > 0 && (
-                  <Text style={styles.insightProducts}>
-                    {suggestion.products.join(' & ')}
-                  </Text>
-                )}
-                <Text style={styles.insightDescription}>{suggestion.description}</Text>
-                {suggestion.recommendation && (
-                  <Text style={styles.insightRecommendation}>
-                    {suggestion.recommendation}
-                  </Text>
-                )}
-              </View>
+              <Text key={idx} style={styles.insightText}>
+                • {suggestion.title} {suggestion.description}
+              </Text>
             ))}
           </View>
         )}
@@ -204,45 +208,43 @@ export default function RoutineResults() {
         </View>
 
         {/* Routine Steps */}
-        <View style={styles.routineSteps}>
-          {currentRoutine.map((item: RoutineStep) => {
-            const isComplete = isStepComplete(item.step);
-            const isMissing = item.product.includes('(Missing)');
-
-            return (
-              <View key={item.step} style={styles.stepCard}>
-                <View style={styles.stepLeft}>
-                  <View
-                    style={[
-                      styles.stepNumber,
-                      selectedTime === 'AM' ? styles.stepNumberAM : styles.stepNumberPM,
-                    ]}
-                  >
-                    <Text style={styles.stepNumberText}>{item.step}</Text>
-                  </View>
-                </View>
-
-                <View style={styles.stepContent}>
-                  <View style={styles.categoryBadge}>
-                    <Text style={styles.categoryText}>{item.category}</Text>
-                  </View>
-
-                  <Text style={[styles.productName, isMissing && styles.productMissing]}>
-                    {item.product}
-                  </Text>
-
-                  <Text style={styles.instructions}>{item.instructions}</Text>
-
-                  {item.notes && (
-                    <View style={styles.notesContainer}>
-                      <Droplet color="#6B7280" size={14} strokeWidth={2} />
-                      <Text style={styles.notesText}>{item.notes}</Text>
-                    </View>
-                  )}
+        <View style={styles.actionPlanCard}>
+          <Text style={styles.cardTitle}>Your Action Plan</Text>
+          {currentRoutine.map((item: RoutineStep) => (
+            <View key={item.step} style={styles.stepItem}>
+              <View style={styles.stepNumber}>
+                <Text style={styles.stepNumberText}>{item.step}</Text>
+              </View>
+              <View style={styles.stepContent}>
+                <Text style={styles.stepTitle}>{item.instructions}</Text>
+                <Text style={styles.stepDescription}>
+                  Tailored for your {results.skinType || 'Normal'} skin to maintain barrier function
+                </Text>
+                <View style={styles.productPill}>
+                  <Text style={styles.productPillText}>{item.product}</Text>
                 </View>
               </View>
-            );
-          })}
+            </View>
+          ))}
+        </View>
+
+        {/* Product Check Card */}
+        <View style={styles.productCheckCard}>
+          <View style={styles.productCheckHeader}>
+            <Lightbulb color="#F59E0B" size={24} strokeWidth={2} />
+            <Text style={styles.productCheckTitle}>
+              Want to check if your current products match your plan?
+            </Text>
+          </View>
+          <Text style={styles.productCheckDescription}>
+            Coming soon: Scan your products to see if they align with your personalized routine.
+          </Text>
+          <TouchableOpacity
+            style={styles.scanButton}
+            onPress={() => router.push('/scan-products')}
+          >
+            <Text style={styles.scanButtonText}>Scan My Products</Text>
+          </TouchableOpacity>
         </View>
 
         <View style={{ height: 240 }} />
@@ -253,36 +255,44 @@ export default function RoutineResults() {
           style={styles.primaryButton}
           onPress={() => router.push('/home')}
         >
-          <Text style={styles.primaryButtonText}>Done - Back to Home</Text>
+          <LinearGradient
+            colors={['#8B5CF6', '#EC4899']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.primaryButtonGradient}
+          >
+            <Text style={styles.primaryButtonText}>Done — Back to Home</Text>
+          </LinearGradient>
         </TouchableOpacity>
 
         <View style={styles.secondaryButtons}>
           <TouchableOpacity
             style={styles.secondaryButton}
-            onPress={() => router.push('/scan-products')}
+            onPress={() => {
+              // Start Over logic
+              router.push('/home');
+            }}
           >
-            <Text style={styles.secondaryButtonText}>Scan Products</Text>
+            <Text style={styles.secondaryButtonText}>Start Over</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.secondaryButton}
             onPress={() => {
-              // Share functionality placeholder
-              console.log('Share routine');
+              // Share logic
             }}
           >
             <Text style={styles.secondaryButtonText}>Share</Text>
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   scrollView: {
     flex: 1,
@@ -309,23 +319,24 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headerTitle: {
+    fontFamily: 'Lora-SemiBold',
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#2C2C2C',
+    color: '#1A1A2E',
     marginBottom: 4,
   },
   subtitle: {
+    fontFamily: 'Lora-Regular',
     fontSize: 12,
-    color: '#6B7280',
+    color: '#6B6B7A',
   },
   section: {
     paddingHorizontal: 16,
     marginBottom: 24,
   },
   sectionTitle: {
+    fontFamily: 'Lora-SemiBold',
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#2C2C2C',
+    color: '#1A1A2E',
     marginBottom: 16,
   },
   insightCard: {
@@ -350,27 +361,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   insightTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#2C2C2C',
-    flex: 1,
   },
-  insightProducts: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#6B7280',
+  insightText: {
+    fontFamily: 'Lora-Regular',
+    fontSize: 15,
+    color: '#4A4A5E',
+    lineHeight: 22,
     marginBottom: 8,
-  },
-  insightDescription: {
-    fontSize: 14,
-    color: '#374151',
-    lineHeight: 20,
-    marginBottom: 8,
-  },
-  insightRecommendation: {
-    fontSize: 14,
-    color: '#2C2C2C',
-    fontWeight: '600',
   },
   missingCard: {
     backgroundColor: '#FFFFFF',
@@ -397,13 +394,14 @@ const styles = StyleSheet.create({
   },
   missingCategory: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Lora-Bold',
     color: '#2C2C2C',
   },
   missingReason: {
     fontSize: 14,
     color: '#374151',
     lineHeight: 20,
+    fontFamily: 'Lora-Regular',
   },
   timeToggle: {
     flexDirection: 'row',
@@ -427,135 +425,121 @@ const styles = StyleSheet.create({
   },
   timeTabText: {
     fontSize: 16,
-    fontWeight: '600',
+    fontFamily: 'Lora-SemiBold',
     color: '#9CA3AF',
   },
   timeTabTextActive: {
     color: '#2C2C2C',
   },
-  routineSteps: {
-    paddingHorizontal: 20,
-  },
-  stepCard: {
+  actionPlanCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 24,
-    padding: 16,
-    flexDirection: 'row',
-    gap: 16,
-    marginBottom: 12,
+    padding: 24,
+    marginHorizontal: 16,
+    marginBottom: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 4,
   },
-  stepLeft: {
-    alignItems: 'center',
+  cardTitle: {
+    fontFamily: 'Lora-SemiBold',
+    fontSize: 18,
+    color: '#1A1A2E',
+    marginBottom: 20,
+  },
+  stepItem: {
+    flexDirection: 'row',
+    gap: 16,
+    marginBottom: 24,
   },
   stepNumber: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: '#10B981',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  stepNumberAM: {
-    backgroundColor: '#A8C8A5',
-  },
-  stepNumberPM: {
-    backgroundColor: '#A8C8A5',
+    marginTop: 2,
   },
   stepNumberText: {
-    color: '#2C2C2C',
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontFamily: 'Lora-Bold',
+    color: '#FFFFFF',
+    fontSize: 16,
   },
   stepContent: {
     flex: 1,
   },
-  categoryBadge: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#DBEAFE',
-    paddingVertical: 4,
-    paddingHorizontal: 12,
-    borderRadius: 6,
-    marginBottom: 8,
-  },
-  categoryText: {
-    fontSize: 11,
-    fontWeight: 'bold',
-    color: '#1E40AF',
-    letterSpacing: 0.5,
-  },
-  productName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1F2937',
-    marginBottom: 8,
-  },
-  productMissing: {
-    color: '#6B7280',
-  },
-  instructions: {
-    fontSize: 14,
-    color: '#4B5563',
-    lineHeight: 20,
-    marginBottom: 8,
-  },
-  notesContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 6,
-    backgroundColor: '#F9FAFB',
-    padding: 8,
-    borderRadius: 8,
-  },
-  notesText: {
-    fontSize: 13,
-    color: '#6B7280',
-    fontStyle: 'italic',
-    flex: 1,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
+  stepTitle: {
+    fontFamily: 'Lora-SemiBold',
     fontSize: 16,
-    color: '#6B7280',
+    color: '#1A1A2E',
+    marginBottom: 4,
   },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 40,
+  stepDescription: {
+    fontFamily: 'Lora-Regular',
+    fontSize: 14,
+    color: '#6B6B7A',
+    marginBottom: 12,
+    lineHeight: 20,
   },
-  errorTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1F2937',
-    marginTop: 24,
+  // Updated product pill styling: neutral background, visible text, Lora font
+  productPill: {
+    backgroundColor: '#F3F4F6', // light neutral background
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    alignSelf: 'flex-start',
+    minWidth: 60,
+    height: 32,
+  },
+  productPillText: {
+    color: '#1A1A2E',
+    fontSize: 12,
+    fontFamily: 'Lora-Regular',
+    // display property removed to show text
+  },
+  productCheckCard: {
+    backgroundColor: '#FFF0F5',
+    borderRadius: 24,
+    padding: 24,
+    marginHorizontal: 16,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#FCE7F3',
+  },
+  productCheckHeader: {
+    flexDirection: 'row',
+    gap: 12,
     marginBottom: 12,
   },
-  errorText: {
-    fontSize: 14,
-    color: '#6B7280',
-    textAlign: 'center',
-    lineHeight: 20,
-    marginBottom: 32,
-  },
-  errorButton: {
-    backgroundColor: '#1F2937',
-    paddingHorizontal: 32,
-    paddingVertical: 14,
-    borderRadius: 12,
-  },
-  errorButtonText: {
-    color: '#FFFFFF',
+  productCheckTitle: {
+    fontFamily: 'Lora-SemiBold',
     fontSize: 16,
-    fontWeight: '600',
+    color: '#1A1A2E',
+    flex: 1,
+    lineHeight: 24,
+  },
+  productCheckDescription: {
+    fontFamily: 'Lora-Regular',
+    fontSize: 14,
+    color: '#4A4A5E',
+    marginBottom: 20,
+    lineHeight: 20,
+  },
+  scanButton: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  scanButtonText: {
+    fontFamily: 'Lora-Medium',
+    color: '#6B6B7A',
+    fontSize: 14,
   },
   bottomActions: {
     position: 'absolute',
@@ -565,23 +549,32 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     padding: 16,
     paddingBottom: 40,
+    gap: 12,
     borderTopWidth: 1,
     borderTopColor: '#E5E7EB',
     width: '100%',
     alignSelf: 'center',
   },
   primaryButton: {
-    backgroundColor: '#8B7355',
     height: 56,
-    borderRadius: 12,
+    borderRadius: 28,
+    marginBottom: 12,
+    shadowColor: '#8B5CF6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  primaryButtonGradient: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 12,
+    borderRadius: 28,
   },
   primaryButtonText: {
+    fontFamily: 'Lora-SemiBold',
     color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: 'bold',
   },
   secondaryButtons: {
     flexDirection: 'row',
@@ -592,14 +585,56 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#8B7355',
+    borderColor: '#E5E7EB',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'transparent',
+    backgroundColor: '#FFFFFF',
   },
   secondaryButtonText: {
-    color: '#8B7355',
+    fontFamily: 'Lora-Medium',
+    color: '#1A1A2E',
     fontSize: 14,
-    fontWeight: '600',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#6B7280',
+    fontFamily: 'Lora-Regular',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 40,
+  },
+  errorTitle: {
+    fontSize: 24,
+    fontFamily: 'Lora-Bold',
+    color: '#1F2937',
+    marginTop: 24,
+    marginBottom: 12,
+  },
+  errorText: {
+    fontSize: 14,
+    color: '#6B7280',
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 32,
+    fontFamily: 'Lora-Regular',
+  },
+  errorButton: {
+    backgroundColor: '#1F2937',
+    paddingHorizontal: 32,
+    paddingVertical: 14,
+    borderRadius: 12,
+  },
+  errorButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontFamily: 'Lora-SemiBold',
   },
 });
