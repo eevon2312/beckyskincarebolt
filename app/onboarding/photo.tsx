@@ -5,12 +5,14 @@ import { useOnboarding } from '@/contexts/OnboardingContext';
 import { Typewriter } from '@/components/Typewriter';
 import { Camera, Upload, X } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function PhotoScreen() {
   const router = useRouter();
   const { updateData } = useOnboarding();
   const [showSecondLine, setShowSecondLine] = useState(false);
   const [photoUri, setPhotoUri] = useState<string>('');
+  const [photoBase64, setPhotoBase64] = useState<string>('');
 
   const requestCameraPermission = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
@@ -55,10 +57,14 @@ export default function PhotoScreen() {
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.8,
+      base64: true,
     });
 
     if (!result.canceled && result.assets[0]) {
       setPhotoUri(result.assets[0].uri);
+      if (result.assets[0].base64) {
+        setPhotoBase64(`data:image/jpeg;base64,${result.assets[0].base64}`);
+      }
     }
   };
 
@@ -68,13 +74,19 @@ export default function PhotoScreen() {
 
   const handleNext = () => {
     if (photoUri) {
-      updateData({ photoUri });
+      updateData({
+        photoUri,
+        photoBase64: photoBase64 || undefined
+      });
       router.push('/onboarding/final');
     }
   };
 
   return (
-    <View style={styles.container}>
+    <LinearGradient
+      colors={['#FFF0F5', '#F8E8FF', '#E6F3FF']}
+      style={styles.container}
+    >
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.content}
@@ -115,12 +127,19 @@ export default function PhotoScreen() {
             ) : (
               <View style={styles.actionsContainer}>
                 <TouchableOpacity style={styles.primaryAction} onPress={handleOpenCamera}>
-                  <Camera color="#FFFFFF" size={24} />
-                  <Text style={styles.primaryActionText}>Open Camera</Text>
+                  <LinearGradient
+                    colors={['#8B5CF6', '#EC4899']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.actionGradient}
+                  >
+                    <Camera color="#FFFFFF" size={24} />
+                    <Text style={styles.primaryActionText}>Open Camera</Text>
+                  </LinearGradient>
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.secondaryAction} onPress={handleUploadPhoto}>
-                  <Upload color="#2C2C2C" size={20} />
+                  <Upload color="#4A4A5E" size={20} />
                   <Text style={styles.secondaryActionText}>Upload a photo instead</Text>
                 </TouchableOpacity>
               </View>
@@ -132,26 +151,32 @@ export default function PhotoScreen() {
       {photoUri && (
         <View style={styles.footer}>
           <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-            <Text style={styles.nextButtonText}>Next</Text>
+            <LinearGradient
+              colors={['#8B5CF6', '#EC4899']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.buttonGradient}
+            >
+              <Text style={styles.nextButtonText}>Next</Text>
+            </LinearGradient>
           </TouchableOpacity>
         </View>
       )}
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F2E8D8',
   },
   scrollView: {
     flex: 1,
   },
   content: {
-    paddingHorizontal: 32,
-    paddingTop: 100,
-    paddingBottom: 140,
+    paddingHorizontal: 20,
+    paddingTop: 60,
+    paddingBottom: 120,
     maxWidth: 600,
     width: '100%',
     alignSelf: 'center',
@@ -160,15 +185,16 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   title: {
-    fontSize: 24,
+    fontFamily: 'Lora-Regular',
+    fontSize: 20,
     lineHeight: 34,
-    color: '#2C2C2C',
-    fontWeight: '500',
+    color: '#1A1A2E',
     marginBottom: 24,
   },
   subtitle: {
+    fontFamily: 'Lora-Regular',
     fontSize: 16,
-    color: '#6B7280',
+    color: '#6B6B7A',
     lineHeight: 24,
   },
   guidelinesList: {
@@ -176,10 +202,16 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     marginBottom: 32,
+    shadowColor: '#8B5CF6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 2,
   },
   guidelineItem: {
+    fontFamily: 'Lora-Regular',
     fontSize: 15,
-    color: '#374151',
+    color: '#4A4A5E',
     lineHeight: 26,
     marginBottom: 8,
   },
@@ -187,18 +219,21 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   primaryAction: {
-    backgroundColor: '#2C2C2C',
     height: 56,
     borderRadius: 12,
+    overflow: 'hidden',
+  },
+  actionGradient: {
+    flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     gap: 12,
   },
   primaryActionText: {
+    fontFamily: 'Lora-SemiBold',
     color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: 'bold',
   },
   secondaryAction: {
     flexDirection: 'row',
@@ -208,9 +243,9 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   secondaryActionText: {
-    color: '#2C2C2C',
+    fontFamily: 'Lora-Medium',
+    color: '#4A4A5E',
     fontSize: 15,
-    fontWeight: '600',
   },
   photoPreviewContainer: {
     position: 'relative',
@@ -229,7 +264,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#2C2C2C',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -238,23 +273,25 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     paddingBottom: 40,
-    backgroundColor: '#F2E8D8',
     alignItems: 'center',
   },
   nextButton: {
     height: 56,
-    backgroundColor: '#2C2C2C',
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderRadius: 30,
+    overflow: 'hidden',
     width: '100%',
     maxWidth: 600,
   },
+  buttonGradient: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   nextButtonText: {
+    fontFamily: 'Lora-SemiBold',
     color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: 'bold',
   },
 });

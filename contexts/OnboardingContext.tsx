@@ -5,7 +5,9 @@ export interface OnboardingData {
   concerns: string[];
   skinType: string;
   sensitivities: string[];
+  confidenceLevel?: string;
   photoUri: string;
+  photoBase64?: string;
 }
 
 interface OnboardingContextType {
@@ -19,7 +21,9 @@ const initialData: OnboardingData = {
   concerns: [],
   skinType: '',
   sensitivities: [],
+  confidenceLevel: '',
   photoUri: '',
+  photoBase64: '',
 };
 
 const OnboardingContext = createContext<OnboardingContextType | undefined>(undefined);

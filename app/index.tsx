@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Typewriter } from '@/components/Typewriter';
 
 export default function Welcome() {
   const router = useRouter();
@@ -11,15 +12,17 @@ export default function Welcome() {
       style={styles.container}
     >
       <View style={styles.content}>
-        <Text style={styles.text}>
-          Welcome to Becky — a calm, judgement-free space for understanding your skin.
-        </Text>
+        <Typewriter
+          text="Welcome to Becky — a calm, judgement-free space for understanding your skin."
+          speed={50}
+          style={styles.text}
+        />
       </View>
 
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => router.push('/onboarding/intro1')}
+          onPress={() => router.push('/onboarding/intro2')}
         >
           <LinearGradient
             colors={['#8B5CF6', '#EC4899']}
@@ -43,17 +46,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 32,
+    paddingHorizontal: 20,
   },
   text: {
     fontFamily: 'Lora-Regular',
-    fontSize: 24,
-    lineHeight: 36,
+    fontSize: 20,
+    lineHeight: 30,
     color: '#1A1A2E',
     textAlign: 'center',
   },
   footer: {
-    padding: 20,
+    padding: 16,
     paddingBottom: 40,
     maxWidth: 400,
     width: '100%',
@@ -80,3 +83,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
+

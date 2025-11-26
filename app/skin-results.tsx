@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, Check, AlertCircle, AlertTriangle, Package, Share2 } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -14,8 +15,8 @@ import storage from '../src/utils/storage';
 
 const CircularProgress = ({ score }: { score: number }) => {
   const progress = useSharedValue(0);
-  const size = 200;
-  const strokeWidth = 12;
+  const size = 160;
+  const strokeWidth = 10;
   const center = size / 2;
   const radius = center - strokeWidth / 2;
   const circumference = 2 * Math.PI * radius;
@@ -379,21 +380,19 @@ export default function SkinResults() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F2E8D8',
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
     paddingBottom: 40,
-    maxWidth: 900,
     width: '100%',
     alignSelf: 'center',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 20,
+    padding: 16,
     paddingTop: 60,
   },
   backButton: {
@@ -407,7 +406,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#2C2C2C',
     marginBottom: 4,
@@ -419,9 +418,9 @@ const styles = StyleSheet.create({
   heroCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 24,
-    padding: 32,
-    marginHorizontal: 20,
-    marginBottom: 24,
+    padding: 24,
+    marginHorizontal: 16,
+    marginBottom: 20,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -439,55 +438,55 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   scoreNumber: {
-    fontSize: 72,
+    fontSize: 56,
     fontWeight: 'bold',
     color: '#2C2C2C',
   },
   scoreTotal: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#6B7280',
-    marginTop: -12,
+    marginTop: -10,
   },
   scoreLabel: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#6B7280',
-    marginTop: 8,
+    marginTop: 6,
   },
   skinTypeBadge: {
     alignSelf: 'center',
-    backgroundColor: '#F1F8F4',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
+    backgroundColor: '#E8F5F1',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
     borderRadius: 9999,
-    marginHorizontal: 20,
-    marginBottom: 24,
+    marginHorizontal: 16,
+    marginBottom: 20,
   },
   skinTypeText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#2C2C2C',
   },
   section: {
-    marginBottom: 24,
+    marginBottom: 20,
   },
   sectionTitle: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#2C2C2C',
-    paddingHorizontal: 20,
-    marginBottom: 16,
+    paddingHorizontal: 16,
+    marginBottom: 12,
   },
   sectionSubtitle: {
     fontSize: 14,
     color: '#6B7280',
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     marginBottom: 12,
   },
   concernCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
-    padding: 20,
-    marginHorizontal: 20,
+    padding: 16,
+    marginHorizontal: 16,
     marginBottom: 12,
     borderLeftWidth: 4,
     shadowColor: '#000',
@@ -503,9 +502,10 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   concernType: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#2C2C2C',
+    flex: 1,
   },
   severityBadge: {
     paddingVertical: 4,
@@ -527,19 +527,18 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   recommendationsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     gap: 12,
   },
   recommendationCard: {
     backgroundColor: '#F1F8F4',
     borderRadius: 16,
-    padding: 20,
-    width: '48%',
+    padding: 16,
+    width: '100%',
+    marginBottom: 12,
   },
   ingredientName: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#2C2C2C',
     marginBottom: 8,
@@ -577,7 +576,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 16,
-    marginHorizontal: 20,
+    marginHorizontal: 16,
     marginBottom: 8,
     flexDirection: 'row',
     alignItems: 'center',
@@ -597,7 +596,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 16,
-    marginHorizontal: 20,
+    marginHorizontal: 16,
     marginBottom: 8,
     flexDirection: 'row',
     alignItems: 'center',
@@ -623,14 +622,14 @@ const styles = StyleSheet.create({
   },
   stepText: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 15,
     color: '#2C2C2C',
   },
   warningCard: {
     backgroundColor: '#FEF2F2',
     borderRadius: 16,
-    padding: 20,
-    marginHorizontal: 20,
+    padding: 16,
+    marginHorizontal: 16,
     borderLeftWidth: 4,
     borderLeftColor: '#EF4444',
     gap: 16,
@@ -644,7 +643,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   warningIngredient: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: 'bold',
     color: '#991B1B',
     marginBottom: 4,
@@ -656,9 +655,9 @@ const styles = StyleSheet.create({
   optionalCard: {
     backgroundColor: '#F9FAFB',
     borderRadius: 16,
-    padding: 20,
-    marginHorizontal: 20,
-    marginBottom: 24,
+    padding: 16,
+    marginHorizontal: 16,
+    marginBottom: 20,
     borderWidth: 1,
     borderColor: '#E5E7EB',
   },
@@ -692,16 +691,18 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#F2E8D8',
-    padding: 20,
+    backgroundColor: '#FFFFFF',
+    padding: 16,
     paddingBottom: 40,
     gap: 12,
     borderTopWidth: 1,
     borderTopColor: '#E5E7EB',
+    width: '100%',
+    alignSelf: 'center',
   },
   primaryButton: {
     height: 56,
-    backgroundColor: '#2C2C2C',
+    backgroundColor: '#8B7355',
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
@@ -720,13 +721,13 @@ const styles = StyleSheet.create({
     height: 48,
     backgroundColor: 'transparent',
     borderWidth: 2,
-    borderColor: '#2C2C2C',
+    borderColor: '#8B7355',
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
   },
   secondaryButtonText: {
-    color: '#2C2C2C',
+    color: '#8B7355',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -743,7 +744,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 40,
+    paddingHorizontal: 32,
   },
   errorTitle: {
     fontSize: 24,
@@ -771,3 +772,4 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
+

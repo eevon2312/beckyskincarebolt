@@ -1,91 +1,153 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useOnboarding } from '@/contexts/OnboardingContext';
 import { Typewriter } from '@/components/Typewriter';
+import { LinearGradient } from 'expo-linear-gradient';
+import { analyzeSkin } from '@/src/services/api';
+import storage from '@/src/utils/storage';
+import SkinAnalysisLoader from '@/components/SkinAnalysisLoader';
 
-export default function FinalScreen() {
+export default function FinalOnboarding() {
   const router = useRouter();
   const { data } = useOnboarding();
-  const [showSecondLine, setShowSecondLine] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  const handleStartAnalysis = () => {
-    router.push('/skin-check');
+  const handleStartAnalysis = async () => {
+    if (!data.photoBase64) {
+      Alert.alert('No Image', 'Please go back and take a photo first');
+      return;
+    }
+
+    try {
+      setIsAnalyzing(true);
+      console.log('🚀 Starting skin analysis...');
+
+      const results = await analyzeSkin(data.photoBase64);
+      console.log('✅ Analysis complete!', results);
+
+      await storage.saveSkinAnalysis(results);
+      console.log('💾 Results saved to storage');
+
+      // Wait a bit for the loader animation
+      setTimeout(() => {
+        setIsAnalyzing(false);
+        router.push('/skin-results');
+      }, 1000);
+
+    } catch (error: any) {
+      console.error('❌ Analysis error:', error);
+      setIsAnalyzing(false);
+
+      let errorMessage = error.message || 'Please try again';
+
+      if (errorMessage.includes('quota') || errorMessage.includes('429')) {
+        errorMessage = 'API quota exceeded. Please wait 1 minute and try again.';
+      }
+
+      Alert.alert('Analysis Failed', errorMessage);
+    }
   };
 
   return (
-    <View style={styles.container}>
+    <LinearGradient
+      colors={['#FFF0F5', '#F8E8FF', '#E6F3FF']}
+      style={styles.container}
+    >
+      <SkinAnalysisLoader
+        visible={isAnalyzing}
+        onComplete={() => { }} // Handled in handleStartAnalysis
+        minimumDuration={2000}
+      />
+
       <View style={styles.content}>
-        <View>
+        <View style={styles.textContainer}>
+          <Text style={styles.greeting}>All set, {data.name}!</Text>
           <Typewriter
-            text={`Thank you, ${data.name}. Becky has what she needs to look after your skin.`}
+            text="Becky is ready to analyze your unique skin profile."
             speed={50}
-            style={styles.text}
-            onComplete={() => {
-              setTimeout(() => setShowSecondLine(true), 500);
-            }}
+            style={styles.heading}
           />
-          {showSecondLine && (
-            <View style={styles.secondLine}>
-              <Typewriter
-                text="We'll use your photo and answers to give you a gentle, personalised skin analysis."
-                speed={50}
-                style={styles.text}
-              />
-            </View>
-          )}
+          <Text style={styles.subtext}>
+            We'll identify your needs and build a routine just for you.
+          </Text>
         </View>
       </View>
 
-      {showSecondLine && (
-        <View style={styles.footer}>
-          <TouchableOpacity
-            style={styles.primaryButton}
-            onPress={handleStartAnalysis}
+      <View style={styles.footer}>
+        <TouchableOpacity
+          style={styles.primaryButton}
+          onPress={handleStartAnalysis}
+          disabled={isAnalyzing}
+        >
+          <LinearGradient
+            colors={['#8B5CF6', '#EC4899']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.buttonGradient}
           >
-            <Text style={styles.primaryButtonText}>Start Skin Analysis</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-    </View>
+            <Text style={styles.primaryButtonText}>
+              {isAnalyzing ? 'Analyzing...' : 'Start Skin Analysis'}
+            </Text>
+          </LinearGradient>
+        </TouchableOpacity>
+      </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F2E8D8',
   },
   content: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 32,
+    paddingHorizontal: 20,
   },
-  text: {
+  textContainer: {
+    gap: 16,
+  },
+  greeting: {
+    fontFamily: 'Lora-Regular',
+    fontSize: 20,
+    color: '#6B7280',
+  },
+  heading: {
+    fontFamily: 'Lora-Regular',
     fontSize: 24,
-    lineHeight: 36,
-    color: '#2C2C2C',
-    textAlign: 'center',
-    fontWeight: '500',
+    lineHeight: 32,
+    color: '#1A1A2E',
   },
-  secondLine: {
-    marginTop: 24,
+  subtext: {
+    fontFamily: 'Lora-Regular',
+    fontSize: 18,
+    lineHeight: 28,
+    color: '#4B5563',
+    marginTop: 8,
   },
   footer: {
-    padding: 20,
+    padding: 16,
     paddingBottom: 40,
   },
   primaryButton: {
-    backgroundColor: '#2C2C2C',
     height: 56,
-    borderRadius: 12,
+    borderRadius: 28,
+    overflow: 'hidden',
+    shadowColor: '#8B5CF6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  buttonGradient: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
   primaryButtonText: {
+    fontFamily: 'Lora-SemiBold',
     color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 18,
   },
 });

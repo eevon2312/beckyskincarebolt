@@ -46,17 +46,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 32,
+    paddingHorizontal: 20,
   },
   text: {
     fontFamily: 'Lora-Regular',
-    fontSize: 24,
-    lineHeight: 36,
+    fontSize: 20,
+    lineHeight: 30,
     color: '#1A1A2E',
     textAlign: 'center',
   },
   footer: {
-    padding: 20,
+    padding: 16,
     paddingBottom: 40,
   },
   primaryButton: {

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Modal } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Sparkles } from 'lucide-react-native';
 import Animated, {
   useAnimatedStyle,
@@ -106,7 +107,10 @@ export default function SkinAnalysisLoader({
       animationType="fade"
       statusBarTranslucent
     >
-      <View style={styles.overlay}>
+      <LinearGradient
+        colors={['#FFF0F5', '#F8E8FF', '#E6F3FF']}
+        style={styles.overlay}
+      >
         <View style={styles.card}>
           <Animated.View style={animatedIconStyle}>
             <Sparkles color="#A8C8A5" size={80} strokeWidth={1.5} />
@@ -132,7 +136,7 @@ export default function SkinAnalysisLoader({
             </View>
           </View>
         </View>
-      </View>
+      </LinearGradient>
     </Modal>
   );
 }
@@ -144,7 +148,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(242, 232, 216, 0.95)',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 50,
@@ -162,8 +165,9 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   message: {
+    fontFamily: 'Lora-Regular',
     fontSize: 18,
-    color: '#2C2C2C',
+    color: '#1A1A2E',
     fontWeight: '500',
     marginTop: 24,
     textAlign: 'center',
@@ -188,3 +192,4 @@ const styles = StyleSheet.create({
     left: -80,
   },
 });
+

@@ -24,47 +24,47 @@ export default function NameScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}
       >
-      <View style={styles.content}>
-        <View style={styles.textContainer}>
-          <Typewriter
-            text="Let's make this routine yours."
-            speed={50}
-            style={styles.heading}
+        <View style={styles.content}>
+          <View style={styles.textContainer}>
+            <Typewriter
+              text="Let's make this routine yours."
+              speed={50}
+              style={styles.heading}
+            />
+            <Text style={styles.subtext}>What should Becky call you?</Text>
+          </View>
+
+          <TextInput
+            style={styles.input}
+            placeholder="First name"
+            placeholderTextColor="#9CA3AF"
+            value={name}
+            onChangeText={setName}
+            autoFocus
+            autoCapitalize="words"
+            returnKeyType="next"
+            onSubmitEditing={name.trim().length > 0 ? handleNext : undefined}
           />
-          <Text style={styles.subtext}>What should Becky call you?</Text>
         </View>
 
-        <TextInput
-          style={styles.input}
-          placeholder="First name"
-          placeholderTextColor="#9CA3AF"
-          value={name}
-          onChangeText={setName}
-          autoFocus
-          autoCapitalize="words"
-          returnKeyType="next"
-          onSubmitEditing={name.trim().length > 0 ? handleNext : undefined}
-        />
-      </View>
-
-      <View style={styles.footer}>
-        <TouchableOpacity
-          style={[styles.primaryButton, name.trim().length === 0 && styles.primaryButtonDisabled]}
-          onPress={handleNext}
-          disabled={name.trim().length === 0}
-        >
-          <LinearGradient
-            colors={['#8B5CF6', '#EC4899']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.buttonGradient}
+        <View style={styles.footer}>
+          <TouchableOpacity
+            style={[styles.primaryButton, name.trim().length === 0 && styles.primaryButtonDisabled]}
+            onPress={handleNext}
+            disabled={name.trim().length === 0}
           >
-            <Text style={[styles.primaryButtonText, name.trim().length === 0 && styles.primaryButtonTextDisabled]}>
-              Next
-            </Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
+            <LinearGradient
+              colors={['#8B5CF6', '#EC4899']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.buttonGradient}
+            >
+              <Text style={[styles.primaryButtonText, name.trim().length === 0 && styles.primaryButtonTextDisabled]}>
+                Next
+              </Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
       </KeyboardAvoidingView>
     </LinearGradient>
   );
@@ -76,16 +76,16 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingHorizontal: 32,
-    paddingTop: 100,
+    paddingHorizontal: 20,
+    paddingTop: 60,
   },
   textContainer: {
     marginBottom: 40,
   },
   heading: {
     fontFamily: 'Lora-SemiBold',
-    fontSize: 28,
-    lineHeight: 38,
+    fontSize: 24,
+    lineHeight: 32,
     color: '#1A1A2E',
     marginBottom: 12,
   },
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     borderColor: '#E5E7EB',
   },
   footer: {
-    padding: 20,
+    padding: 16,
     paddingBottom: 40,
   },
   primaryButton: {

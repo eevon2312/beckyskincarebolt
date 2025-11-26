@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-nati
 import { useRouter } from 'expo-router';
 import { useOnboarding } from '@/contexts/OnboardingContext';
 import { Typewriter } from '@/components/Typewriter';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const sensitivityOptions = [
   'Fragrance',
@@ -34,12 +35,17 @@ export default function SensitivitiesScreen() {
   };
 
   const handleNext = () => {
-    updateData({ sensitivities: selectedSensitivities });
-    router.push('/onboarding/photo');
+    if (selectedSensitivities.length > 0) {
+      updateData({ sensitivities: selectedSensitivities });
+      router.push('/onboarding/confidence');
+    }
   };
 
   return (
-    <View style={styles.container}>
+    <LinearGradient
+      colors={['#FFF0F5', '#F8E8FF', '#E6F3FF']}
+      style={styles.container}
+    >
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.content}
@@ -85,25 +91,31 @@ export default function SensitivitiesScreen() {
           style={styles.nextButton}
           onPress={handleNext}
         >
-          <Text style={styles.nextButtonText}>Next</Text>
+          <LinearGradient
+            colors={['#8B5CF6', '#EC4899']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.buttonGradient}
+          >
+            <Text style={styles.nextButtonText}>Next</Text>
+          </LinearGradient>
         </TouchableOpacity>
       </View>
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F2E8D8',
   },
   scrollView: {
     flex: 1,
   },
   content: {
-    paddingHorizontal: 32,
-    paddingTop: 100,
-    paddingBottom: 120,
+    paddingHorizontal: 20,
+    paddingTop: 60,
+    paddingBottom: 100,
     maxWidth: 600,
     width: '100%',
     alignSelf: 'center',
@@ -112,15 +124,16 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   title: {
-    fontSize: 24,
+    fontFamily: 'Lora-Regular',
+    fontSize: 20,
     lineHeight: 34,
-    color: '#2C2C2C',
-    fontWeight: '500',
+    color: '#1A1A2E',
     marginBottom: 16,
   },
   subtitle: {
+    fontFamily: 'Lora-Regular',
     fontSize: 16,
-    color: '#6B7280',
+    color: '#6B6B7A',
     lineHeight: 24,
   },
   chipsContainer: {
@@ -133,19 +146,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 9999,
     borderWidth: 2,
-    borderColor: '#D1D5DB',
+    borderColor: 'rgba(74, 74, 94, 0.4)',
     backgroundColor: '#FFFFFF',
   },
   chipSelected: {
-    backgroundColor: '#2C2C2C',
-    borderColor: '#2C2C2C',
+    backgroundColor: '#8B5CF6',
+    borderColor: '#8B5CF6',
   },
   chipText: {
+    fontFamily: 'Lora-Medium',
     fontSize: 15,
-    fontWeight: '500',
-    color: '#2C2C2C',
+    color: '#4A4A5E',
   },
   chipTextSelected: {
+    fontFamily: 'Lora-SemiBold',
     color: '#FFFFFF',
   },
   footer: {
@@ -153,23 +167,25 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     paddingBottom: 40,
-    backgroundColor: '#F2E8D8',
     alignItems: 'center',
   },
   nextButton: {
     height: 56,
-    backgroundColor: '#2C2C2C',
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderRadius: 30,
+    overflow: 'hidden',
     width: '100%',
     maxWidth: 600,
   },
+  buttonGradient: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   nextButtonText: {
+    fontFamily: 'Lora-SemiBold',
     color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: 'bold',
   },
 });
