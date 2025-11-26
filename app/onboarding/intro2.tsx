@@ -2,13 +2,17 @@ import { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Typewriter } from '@/components/Typewriter';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function Intro2() {
   const router = useRouter();
   const [showSecondLine, setShowSecondLine] = useState(false);
 
   return (
-    <View style={styles.container}>
+    <LinearGradient
+      colors={['#FFF0F5', '#F8E8FF', '#E6F3FF']}
+      style={styles.container}
+    >
       <View style={styles.content}>
         <View>
           <Typewriter
@@ -36,17 +40,23 @@ export default function Intro2() {
           style={styles.primaryButton}
           onPress={() => router.push('/onboarding/intro3')}
         >
-          <Text style={styles.primaryButtonText}>Continue</Text>
+          <LinearGradient
+            colors={['#8B5CF6', '#EC4899']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.buttonGradient}
+          >
+            <Text style={styles.primaryButtonText}>Continue</Text>
+          </LinearGradient>
         </TouchableOpacity>
       </View>
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F2E8D8',
   },
   content: {
     flex: 1,
@@ -55,11 +65,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
   },
   text: {
+    fontFamily: 'Lora-Regular',
     fontSize: 24,
     lineHeight: 36,
-    color: '#2C2C2C',
+    color: '#1A1A2E',
     textAlign: 'center',
-    fontWeight: '500',
   },
   secondLine: {
     marginTop: 24,
@@ -69,15 +79,23 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   primaryButton: {
-    backgroundColor: '#2C2C2C',
     height: 56,
-    borderRadius: 12,
+    borderRadius: 30,
+    overflow: 'hidden',
+    shadowColor: '#8B5CF6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  buttonGradient: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
   primaryButtonText: {
+    fontFamily: 'Lora-SemiBold',
     color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: 'bold',
   },
 });

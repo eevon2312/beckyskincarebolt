@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, KeyboardAvoidingVi
 import { useRouter } from 'expo-router';
 import { Typewriter } from '@/components/Typewriter';
 import { useOnboarding } from '@/contexts/OnboardingContext';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function NameScreen() {
   const router = useRouter();
@@ -15,10 +16,14 @@ export default function NameScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
+    <LinearGradient
+      colors={['#FFF0F5', '#F8E8FF', '#E6F3FF']}
+      style={{ flex: 1 }}
     >
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.container}
+      >
       <View style={styles.content}>
         <View style={styles.textContainer}>
           <Typewriter
@@ -48,19 +53,26 @@ export default function NameScreen() {
           onPress={handleNext}
           disabled={name.trim().length === 0}
         >
-          <Text style={[styles.primaryButtonText, name.trim().length === 0 && styles.primaryButtonTextDisabled]}>
-            Next
-          </Text>
+          <LinearGradient
+            colors={['#8B5CF6', '#EC4899']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.buttonGradient}
+          >
+            <Text style={[styles.primaryButtonText, name.trim().length === 0 && styles.primaryButtonTextDisabled]}>
+              Next
+            </Text>
+          </LinearGradient>
         </TouchableOpacity>
       </View>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F2E8D8',
   },
   content: {
     flex: 1,
@@ -71,24 +83,26 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   heading: {
+    fontFamily: 'Lora-SemiBold',
     fontSize: 28,
     lineHeight: 38,
-    color: '#2C2C2C',
-    fontWeight: 'bold',
+    color: '#1A1A2E',
     marginBottom: 12,
   },
   subtext: {
+    fontFamily: 'Lora-Regular',
     fontSize: 16,
-    color: '#6B7280',
+    color: '#6B6B7A',
     marginTop: 12,
   },
   input: {
+    fontFamily: 'Lora-Regular',
     backgroundColor: '#FFFFFF',
     height: 56,
     borderRadius: 12,
     paddingHorizontal: 20,
     fontSize: 16,
-    color: '#2C2C2C',
+    color: '#1A1A2E',
     borderWidth: 2,
     borderColor: '#E5E7EB',
   },
@@ -97,21 +111,24 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   primaryButton: {
-    backgroundColor: '#2C2C2C',
     height: 56,
-    borderRadius: 12,
+    borderRadius: 30,
+    overflow: 'hidden',
+  },
+  primaryButtonDisabled: {
+    opacity: 0.5,
+  },
+  buttonGradient: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  primaryButtonDisabled: {
-    backgroundColor: '#E5E7EB',
-  },
   primaryButtonText: {
+    fontFamily: 'Lora-SemiBold',
     color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: 'bold',
   },
   primaryButtonTextDisabled: {
-    color: '#9CA3AF',
+    opacity: 0.6,
   },
 });

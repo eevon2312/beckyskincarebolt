@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-nati
 import { useRouter } from 'expo-router';
 import { useOnboarding } from '@/contexts/OnboardingContext';
 import { Typewriter } from '@/components/Typewriter';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const concerns = [
   'Breakouts/Acne',
@@ -33,7 +34,10 @@ export default function ConcernsOnboarding() {
   };
 
   return (
-    <View style={styles.container}>
+    <LinearGradient
+      colors={['#FFF0F5', '#F8E8FF', '#E6F3FF']}
+      style={styles.container}
+    >
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.content}
@@ -80,19 +84,25 @@ export default function ConcernsOnboarding() {
           onPress={handleNext}
           disabled={selectedConcerns.length === 0}
         >
-          <Text style={[styles.nextButtonText, selectedConcerns.length === 0 && styles.nextButtonTextDisabled]}>
-            Next
-          </Text>
+          <LinearGradient
+            colors={['#8B5CF6', '#EC4899']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.buttonGradient}
+          >
+            <Text style={[styles.nextButtonText, selectedConcerns.length === 0 && styles.nextButtonTextDisabled]}>
+              Next
+            </Text>
+          </LinearGradient>
         </TouchableOpacity>
       </View>
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F2E8D8',
   },
   scrollView: {
     flex: 1,
@@ -109,14 +119,15 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   greeting: {
+    fontFamily: 'Lora-SemiBold',
     fontSize: 28,
-    fontWeight: 'bold',
-    color: '#2C2C2C',
+    color: '#1A1A2E',
     marginBottom: 16,
   },
   title: {
+    fontFamily: 'Lora-Regular',
     fontSize: 20,
-    color: '#6B7280',
+    color: '#4A4A5E',
     lineHeight: 30,
   },
   pillsContainer: {
@@ -130,19 +141,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 28,
     borderRadius: 9999,
     borderWidth: 2,
-    borderColor: '#D1D5DB',
-    backgroundColor: '#FEFEFE',
+    borderColor: 'rgba(74, 74, 94, 0.4)',
+    backgroundColor: '#FFFFFF',
   },
   pillSelected: {
-    backgroundColor: '#2C2C2C',
-    borderColor: '#2C2C2C',
+    backgroundColor: '#8B5CF6',
+    borderColor: '#8B5CF6',
   },
   pillText: {
+    fontFamily: 'Lora-Medium',
     fontSize: 16,
-    fontWeight: '500',
-    color: '#2C2C2C',
+    color: '#4A4A5E',
   },
   pillTextSelected: {
+    fontFamily: 'Lora-SemiBold',
     color: '#FFFFFF',
   },
   footer: {
@@ -151,28 +163,30 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     paddingHorizontal: 24,
-    paddingBottom: 24,
-    backgroundColor: '#F2E8D8',
+    paddingBottom: 40,
     alignItems: 'center',
   },
   nextButton: {
     height: 56,
-    backgroundColor: '#2C2C2C',
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderRadius: 30,
+    overflow: 'hidden',
     width: '100%',
     maxWidth: 600,
   },
   nextButtonDisabled: {
-    backgroundColor: '#E5E7EB',
+    opacity: 0.5,
+  },
+  buttonGradient: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   nextButtonText: {
+    fontFamily: 'Lora-SemiBold',
     color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: 'bold',
   },
   nextButtonTextDisabled: {
-    color: '#9CA3AF',
+    opacity: 0.6,
   },
 });

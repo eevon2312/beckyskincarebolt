@@ -3,9 +3,30 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { OnboardingProvider } from '@/contexts/OnboardingContext';
+import { useFonts, Lora_400Regular, Lora_500Medium, Lora_600SemiBold, Lora_700Bold } from '@expo-google-fonts/lora';
+import { SplashScreen } from 'expo-router';
+
+SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   useFrameworkReady();
+
+  const [fontsLoaded, fontError] = useFonts({
+    'Lora-Regular': Lora_400Regular,
+    'Lora-Medium': Lora_500Medium,
+    'Lora-SemiBold': Lora_600SemiBold,
+    'Lora-Bold': Lora_700Bold,
+  });
+
+  useEffect(() => {
+    if (fontsLoaded || fontError) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded, fontError]);
+
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
 
   return (
     <OnboardingProvider>
