@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import Constants from 'expo-constants';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useOnboarding } from '@/contexts/OnboardingContext';
 import { Typewriter } from '@/components/Typewriter';
 import { LinearGradient } from 'expo-linear-gradient';
 import { analyzeSkin } from '@/src/services/api';
+const OPENROUTER_API_KEY = Constants?.manifest?.extra?.OPENROUTER_API_KEY || process.env.EXPO_PUBLIC_OPENROUTER_API_KEY;
 import storage from '@/src/utils/storage';
 import SkinAnalysisLoader from '@/components/SkinAnalysisLoader';
 
@@ -78,7 +80,7 @@ export default function FinalOnboarding() {
         <TouchableOpacity
           style={styles.primaryButton}
           onPress={handleStartAnalysis}
-          disabled={isAnalyzing}
+          disabled={isAnalyzing || !OPENROUTER_API_KEY}
         >
           <LinearGradient
             colors={['#8B5CF6', '#EC4899']}
@@ -90,6 +92,11 @@ export default function FinalOnboarding() {
               {isAnalyzing ? 'Analyzing...' : 'Start Skin Analysis'}
             </Text>
           </LinearGradient>
+          {!OPENROUTER_API_KEY && (
+            <Text style={{ color: '#EF4444', marginTop: 8, textAlign: 'center' }}>
+              API key is missing. Please configure OPENROUTER_API_KEY.
+            </Text>
+          )}
         </TouchableOpacity>
       </View>
     </LinearGradient>
